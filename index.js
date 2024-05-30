@@ -11,5 +11,5 @@ app.get("/", async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log("8000번에서 돌아감");
+  console.log(`${port}번에서 돌아감`);
 });
