@@ -1,3 +1,5 @@
+const Inquiry = require('../models/Inquiry');
+
 // const Book = require('../models/bookModel');
 
 // exports.getAllBooks = async (req, res) => {
@@ -45,19 +47,35 @@
 
 // exports.deleteBook = async (req, res) => {
 //   try {
-//       const deletedBook = await Book.findByIdAndDelete(req.params.id);
-//       if (!deletedBook) {
-//           return res.status(404).json({ message: 'Book not found' });
-//       }
-//       res.json({ message: 'Book deleted' });
+// const deletedBook = await Book.findByIdAndDelete(req.params.id);
+// if (!deletedBook) {
+//     return res.status(404).json({ message: 'Book not found' });
+// }
+// res.json({ message: 'Book deleted' });
 //   } catch (error) {
 //       res.status(500).json({ error: error.message });
 //   }
 // };
 
-exports.getBingoStatus = async (req, res) => {
+exports.updateInquiry = async (req, res) => {
   try {
-    // 기능 구현 영역
+    const { title, email, content } = req.body;
+    const inquiryDoc = await Inquiry.create({ title, email, content });
+    console.log('inquiryDoc', inquiryDoc);
+    res.status(200).json(userDoc);
+  } catch (error) {
+    res.status(400).json({ error: 'Invalid request' });
+  }
+};
+
+exports.deleteUser = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const deletedUser = await User.findByIdAndDelete(id);
+    if (!deletedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json({ message: 'User deleted' });
   } catch (error) {
     console.error(error);
   }
