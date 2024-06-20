@@ -5,7 +5,7 @@ const myPageController = require('../controller/myPageController');
 
 router.post('/inquiry', myPageController.updateInquiry);
 router.post('/delete-user', myPageController.deleteUser);
-
+router.post('/duplicateCheck', myPageController.duplicateCheck);
 // router.get('/', bookController.getAllBooks);
 // router.post('/', bookController.createBook);
 // router.get('/:id', bookController.getBookById);
