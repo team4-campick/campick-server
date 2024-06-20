@@ -1,61 +1,5 @@
 const Inquiry = require('../models/Inquiry');
-
-// const Book = require('../models/bookModel');
-
-// exports.getAllBooks = async (req, res) => {
-//   try {
-//       const books = await Book.find();
-//       res.json(books);
-//   } catch (error) {
-//       res.status(500).json({ error: error.message });
-//   }
-// };
-
-// exports.createBook = async (req, res) => {
-//   try {
-//       const newBook = new Book(req.body);
-//       await newBook.save();
-//       res.status(201).json(newBook);
-//   } catch (error) {
-//       res.status(500).json({ error: error.message });
-//   }
-// };
-
-// exports.getBookById = async (req, res) => {
-//   try {
-//       const book = await Book.findById(req.params.id);
-//       if (!book) {
-//           return res.status(404).json({ message: 'Book not found' });
-//       }
-//       res.json(book);
-//   } catch (error) {
-//       res.status(500).json({ error: error.message });
-//   }
-// };
-
-// exports.updateBook = async (req, res) => {
-//   try {
-//       const updatedBook = await Book.findByIdAndUpdate(req.params.id, req.body, { new: true });
-//       if (!updatedBook) {
-//           return res.status(404).json({ message: 'Book not found' });
-//       }
-//       res.json(updatedBook);
-//   } catch (error) {
-//       res.status(500).json({ error: error.message });
-//   }
-// };
-
-// exports.deleteBook = async (req, res) => {
-//   try {
-// const deletedBook = await Book.findByIdAndDelete(req.params.id);
-// if (!deletedBook) {
-//     return res.status(404).json({ message: 'Book not found' });
-// }
-// res.json({ message: 'Book deleted' });
-//   } catch (error) {
-//       res.status(500).json({ error: error.message });
-//   }
-// };
+const User = require('../models/User');
 
 exports.updateInquiry = async (req, res) => {
   try {
@@ -72,10 +16,73 @@ exports.deleteUser = async (req, res) => {
   try {
     const id = req.params.id;
     const deletedUser = await User.findByIdAndDelete(id);
-    if (!deletedUser) {
-      return res.status(404).json({ message: 'User not found' });
+    !deletedUser
+      ? res.status(404).json({ message: 'User not found' })
+      : res.json({ message: 'User deleted' });
+    // if (!deletedUser) {
+    //   return res.status(404).json({ message: 'User not found' });
+    // }
+    // res.json({ message: 'User deleted' });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+exports.duplicateCheck = async (req, res) => {
+  try {
+    const { nickname } = req.body;
+    console.log('nickname이 들어왔다 이놈아', nickname);
+    const nicknameDoc = await User.findOne({ nickname });
+    console.log('nicknameDoc', nicknameDoc);
+    if (!nicknameDoc) {
+      return res.status(200).json({ message: 'Nickname is available' });
     }
-    res.json({ message: 'User deleted' });
+    res.status(409).json({ message: 'Nickname already exists' });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+exports.bingoStatusCheck = async (req, res) => {
+  try {
+    /**
+     * 마이페이지에서 빙고 탭에 접속하면 빙고의 상태를 불러오는 부분
+     * 이곳에서 해야하는 기능
+     * 1. 빙고 칸 clear 여부 체크
+     * 2. 빙고 갯수만큼 해당 영역
+     * index ex)
+     * 0,1,2 -> 1bingo
+     * 3,4,5 -> 2bingo
+     * 6,7,8 -> 3bingo
+     * 0,4,8 -> 4bingo
+     * 2,4,6 -> 5bingo
+     * 0,3,6 -> 6bingo
+     * 1,4,7 -> 7bingo
+     * 2,5,8 -> 8bingo
+     *
+     */
+    const { mission } = req.body;
+    const missionDoc = await Bingo;
+  } catch (error) {
+    console.error(error);
+  }
+};
+exports.bingoStatusUpdate = async (req, res) => {
+  try {
+    /**
+     * 미션 달성되면 해당 미션의 빙고칸을 달성 혹은 clear 등으로 상태를 업데이트 하자.
+     */
+  } catch (error) {
+    console.error(error);
+  }
+};
+exports.bingoStatusReset = async (req, res) => {
+  try {
+    /**
+     * 9칸이 다 찼을 경우 빙고판을 리셋 => 클라이언트 단에서 버튼 하나 만들어서
+     * 빙고가 완성되었습니다. 게임을 다시 하려면 버튼을 클릭해주세요 를 해두고 클릭시
+     * 초기화 하는 방식으로 진해할 예정
+     * */
   } catch (error) {
     console.error(error);
   }
