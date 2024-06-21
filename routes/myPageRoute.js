@@ -4,8 +4,8 @@ const myPageController = require('../controller/myPageController');
 // const bookController = require('../controllers/bookController');
 
 router.post('/inquiry', myPageController.updateInquiry);
-router.post('/delete-user', myPageController.deleteUser);
-
+router.post('/delete-user/:id', myPageController.deleteUser);
+router.post('/duplicateCheck', myPageController.duplicateCheck);
 // router.get('/', bookController.getAllBooks);
 // router.post('/', bookController.createBook);
 // router.get('/:id', bookController.getBookById);
