@@ -11,10 +11,21 @@ exports.updateInquiry = async (req, res) => {
     res.status(400).json({ error: 'Invalid request' });
   }
 };
-
+exports.getUser = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const userDoc = await UserServices.getUser(userId);
+    console.log('userId', userId);
+    console.log('userDoc', userDoc);
+    res.status(200).json({ success: true, userDoc });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 exports.deleteUser = async (req, res) => {
   try {
     const userId = req.params.id;
+    console.log('test', userId);
     const deletedUser = await UserServices.deleteUser(userId);
     res.status(200).json({ success: true, message: deletedUser.message });
   } catch (error) {
