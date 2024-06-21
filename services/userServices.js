@@ -1,4 +1,4 @@
-const User = require('../models/User');
+const User = require('../models/User');
 class UserService {
   async deleteUser(userId) {
     const user = await User.findById(userId);
