@@ -1,5 +1,4 @@
 const Inquiry = require('../models/Inquiry');
-const User = require('../models/User');
 const UserServices = require('../services/userServices');
 
 exports.updateInquiry = async (req, res) => {
