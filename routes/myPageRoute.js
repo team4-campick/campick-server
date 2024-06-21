@@ -3,8 +3,9 @@ const router = express.Router();
 const myPageController = require('../controller/myPageController');
 // const bookController = require('../controllers/bookController');
 
+router.get('/get-user/:id', myPageController.getUser);
 router.post('/inquiry', myPageController.updateInquiry);
-router.post('/delete-user/:id', myPageController.deleteUser);
+router.delete('/delete-user/:id', myPageController.deleteUser);
 router.post('/duplicateCheck', myPageController.duplicateCheck);
 // router.get('/', bookController.getAllBooks);
 // router.post('/', bookController.createBook);
