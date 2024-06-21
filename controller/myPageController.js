@@ -1,5 +1,6 @@
 const Inquiry = require('../models/Inquiry');
 const User = require('../models/User');
+const UserServices = require('../services/userServices');
 
 exports.updateInquiry = async (req, res) => {
   try {
@@ -14,32 +15,23 @@ exports.updateInquiry = async (req, res) => {
 
 exports.deleteUser = async (req, res) => {
   try {
-    const id = req.params.id;
-    const deletedUser = await User.findByIdAndDelete(id);
-    !deletedUser
-      ? res.status(404).json({ message: 'User not found' })
-      : res.json({ message: 'User deleted' });
-    // if (!deletedUser) {
-    //   return res.status(404).json({ message: 'User not found' });
-    // }
-    // res.json({ message: 'User deleted' });
+    const userId = req.params.id;
+    const deletedUser = await UserServices.deleteUser(userId);
+    res.status(200).json({ success: true, message: deletedUser.message });
   } catch (error) {
-    console.error(error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
 exports.duplicateCheck = async (req, res) => {
   try {
     const { nickname } = req.body;
-    console.log('nickname이 들어왔다 이놈아', nickname);
-    const nicknameDoc = await User.findOne({ nickname });
-    console.log('nicknameDoc', nicknameDoc);
-    if (!nicknameDoc) {
-      return res.status(200).json({ message: 'Nickname is available' });
-    }
-    res.status(409).json({ message: 'Nickname already exists' });
+    console.log(nickname);
+    const nicknameDoc = await UserServices.duplicateNickname(nickname);
+    console.log(nicknameDoc.message);
+    res.status(200).json({ success: true, message: nicknameDoc.message });
   } catch (error) {
-    console.error(error);
+    res.status(409).json({ success: false, message: error.message });
   }
 };
 
@@ -48,7 +40,7 @@ exports.bingoStatusCheck = async (req, res) => {
     /**
      * 마이페이지에서 빙고 탭에 접속하면 빙고의 상태를 불러오는 부분
      * 이곳에서 해야하는 기능
-     * 1. 빙고 칸 clear 여부 체크
+     * 1. 빙고 칸 clear 여부 체크 0, 1 로 체크
      * 2. 빙고 갯수만큼 해당 영역
      * index ex)
      * 0,1,2 -> 1bingo
