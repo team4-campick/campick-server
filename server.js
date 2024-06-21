@@ -12,6 +12,7 @@ const clientPort = process.env.CLIENT_PORT_NUM;
 app.use(cors({ credentials: true, origin: `http://localhost:${clientPort}` }));
 app.use(express.json());
 app.use("/", myPageRoute);
+app.use("/", myPageRoute);
 app.use("/api/sale-posts", salePostRoutes);
 
 mongoose.connect(connectUri);
