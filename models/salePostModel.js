@@ -11,6 +11,10 @@ const salePostSchema = new Schema(
       type: String,
       require: true,
     },
+    isNegotiable: {
+      type: Boolean,
+      require: true,
+    },
     price: {
       type: Number,
       required: true,
