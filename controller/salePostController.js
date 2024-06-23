@@ -1,6 +1,24 @@
 const SalePost = require("../models/salePostModel.js");
 
 const getSalePosts = async (req, res) => {
+  if (req.query.category) {
+    const { category } = req.query;
+    try {
+      const salePosts = await SalePost.find({ category });
+      if (salePosts.length === 0) {
+        return res
+          .status(404)
+          .json({ result: false, message: "게시물이 존재하지 않습니다." });
+      }
+      return res.status(200).json({ result: true, salePosts });
+    } catch (error) {
+      return res.status(500).json({
+        result: false,
+        message: "잠시후 다시 시도해주세요.",
+      });
+    }
+  }
+
   try {
     const salePosts = await SalePost.find({});
     return res.status(200).json({ result: true, salePosts });
@@ -45,6 +63,7 @@ const createSalePost = async (req, res) => {
     price,
     desc,
     imageUrl,
+    isNegotiable,
   } = req.body;
 
   // if (!nickname || !price || !desc || !productName) {
@@ -64,6 +83,7 @@ const createSalePost = async (req, res) => {
       price,
       desc,
       imageUrl,
+      isNegotiable,
       salesStatus: "selling",
     });
 
