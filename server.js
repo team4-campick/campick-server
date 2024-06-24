@@ -3,19 +3,26 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const salePostRoutes = require('./routes/salePostRoutes');
 const myPageRoute = require('./routes/myPageRoute');
-const mongoose = require('mongoose');
+const db = require('./utils/db');
 require('dotenv').config();
+
+// register test area
+const testRegisterRoute = require('./routes/testRegisterRoute');
 
 const app = express();
 const port = process.env.PORT_NUM;
-const connectUri = process.env.DB_KEYS;
+
 const clientPort = process.env.CLIENT_PORT_NUM;
 app.use(cors({ credentials: true, origin: `http://localhost:${clientPort}` }));
 app.use(express.json());
 app.use('/api/sale-posts', salePostRoutes);
 
+// register test area
+app.use('/', testRegisterRoute);
+
 app.use('/', myPageRoute);
-mongoose.connect(connectUri);
+
+db.connectDB();
 
 app.get('/', async (req, res) => res.json('Hello World!'));
 
