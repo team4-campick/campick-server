@@ -11,10 +11,27 @@ exports.updateInquiry = async (req, res) => {
     res.status(400).json({ error: 'Invalid request' });
   }
 };
+exports.updateUser = async (req, res) => {
+  try {
+    const username = req.params.id;
+    const { nickname, password } = req.body;
+    console.log('test', username);
+    console.log(nickname, password);
+    const userDoc = await UserServices.updateUserData(
+      username,
+      nickname,
+      password
+    );
+    console.log('userDoc', userDoc);
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error(error);
+  }
+};
 exports.getUser = async (req, res) => {
   try {
     const userId = req.params.id;
-    const userDoc = await UserServices.getUser(userId);
+    const userDoc = await UserServices.getUserData(userId);
     console.log('userId', userId);
     console.log('userDoc', userDoc);
     res.status(200).json({ success: true, userDoc });
@@ -44,27 +61,23 @@ exports.duplicateCheck = async (req, res) => {
     res.status(409).json({ success: false, message: error.message });
   }
 };
+exports.passwordCheck = async (req, res) => {
+  try {
+    const username = req.params.id;
+    const { password } = req.body;
+    console.log(username, password);
+    const userDoc = await UserServices.passwordCheck(username, password);
+    console.log('userDoc222', userDoc);
+    res.status(200).json({ success: true });
+  } catch (error) {
+    res.status(401).json({ success: false, message: error.message });
+  }
+};
 
 exports.bingoStatusCheck = async (req, res) => {
   try {
-    /**
-     * 마이페이지에서 빙고 탭에 접속하면 빙고의 상태를 불러오는 부분
-     * 이곳에서 해야하는 기능
-     * 1. 빙고 칸 clear 여부 체크 0, 1 로 체크
-     * 2. 빙고 갯수만큼 해당 영역
-     * index ex)
-     * 0,1,2 -> 1bingo
-     * 3,4,5 -> 2bingo
-     * 6,7,8 -> 3bingo
-     * 0,4,8 -> 4bingo
-     * 2,4,6 -> 5bingo
-     * 0,3,6 -> 6bingo
-     * 1,4,7 -> 7bingo
-     * 2,5,8 -> 8bingo
-     *
-     */
-    const { mission } = req.body;
-    const missionDoc = await Bingo;
+    const userId = req.params.id;
+    const bingo = await Bingo.findOne({ userId });
   } catch (error) {
     console.error(error);
   }

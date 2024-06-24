@@ -1,26 +1,20 @@
 const mongoose = require('mongoose');
 
-const userSchema = new mongoose.Schema({
+const bingoSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true,
   },
-  password: {
-    type: String,
+  mission: {
+    type: Array,
     required: true,
   },
-  nickname: {
-    type: String,
-    required: true,
-    // unique: true,
-  },
-
   // loginDate: {
   //   type: Object,
   //   required: true,
   // },
   // time form "2011-10-05T14:48:00.000Z"
 });
-const User = mongoose.model('User', userSchema);
+const Bingo = mongoose.model('Bingo', bingoSchema);
 
-module.exports = User;
+module.exports = Bingo;
