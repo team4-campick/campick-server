@@ -1,4 +1,3 @@
-const consecutiveVisitDays = async (req, res) => {
-  const { loginDate } = req.body;
-  console.log('loginDate', loginDate);
+const consecutiveVisitDays = (dateArr) => {
+  dateArr.sort((a, b) => a - b);
 };
