@@ -1,14 +1,24 @@
-const { Schema, model } = require("mongoose");
+const { Schema, model } = require('mongoose');
+
+const imageSchema = new Schema({
+  url: {
+    type: String,
+  },
+});
 
 const salePostSchema = new Schema(
   {
     nickname: {
       type: String,
       // required: true,
-      ref: "User",
+      ref: 'User',
     },
     category: {
       type: String,
+      require: true,
+    },
+    isNegotiable: {
+      type: Boolean,
       require: true,
     },
     price: {
@@ -34,13 +44,13 @@ const salePostSchema = new Schema(
       type: String,
       required: true,
     },
-    imageUrl: {
-      type: String,
+    imageUrls: {
+      type: [imageSchema],
     },
     salesStatus: {
       type: String,
-      enum: ["selling", "sold", "reserved"],
-      default: "selling",
+      enum: ['selling', 'sold', 'reserved'],
+      default: 'selling',
     },
   },
   {
@@ -48,6 +58,6 @@ const salePostSchema = new Schema(
   }
 );
 
-const SalePost = model("SalePost", salePostSchema);
+const SalePost = model('SalePost', salePostSchema);
 
 module.exports = SalePost;

@@ -3,11 +3,25 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const salePostRoutes = require('./routes/salePostRoutes');
 const myPageRoute = require('./routes/myPageRoute');
-const db = require('./utils/db');
-require('dotenv').config();
 
 // register test area
 const testRegisterRoute = require('./routes/testRegisterRoute');
+
+
+const db = require('./utils/db');
+require('dotenv').config();
+
+
+const mongoose = require('mongoose');
+const cloudinary = require('cloudinary');
+require('dotenv').config();
+
+// Cloudinary 설정
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 const app = express();
 const port = process.env.PORT_NUM;
