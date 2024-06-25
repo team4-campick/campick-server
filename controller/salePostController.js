@@ -65,10 +65,10 @@ const createSalePost = async (req, res) => {
 
   const newPost = JSON.parse(req.body.newPost);
 
-  // if (!nickname || !price || !desc || !productName) {
+  // if (!category || !region || !city || !price || !desc || !productName) {
   //   return res
   //     .status(400)
-  //     .json({ result: false, message: "이름, 가격, 상품정보는 필수값입니다." });
+  //     .json({ result: false, message: '필수항목을 입력해주세요.' });
   // }
 
   try {
@@ -92,7 +92,17 @@ const createSalePost = async (req, res) => {
 
 const updateSalePost = async (req, res) => {
   const { id } = req.params;
-  const { nickname, price, desc, imageUrl, salesStatus } = req.body;
+  const {
+    category,
+    productName,
+    region,
+    city,
+    price,
+    desc,
+    condition,
+    isNegotiable,
+  } = req.body;
+  console.log(req.body);
 
   try {
     const salePost = await SalePost.findById(id);
@@ -102,11 +112,14 @@ const updateSalePost = async (req, res) => {
         .json({ result: false, message: '게시물이 존재하지 않습니다.' });
     }
 
-    salePost.nickname = nickname;
+    salePost.category = category;
     salePost.price = price;
     salePost.desc = desc;
-    salePost.imageUrl = imageUrl;
-    salePost.salesStatus = salesStatus;
+    salePost.productName = productName;
+    salePost.region = region;
+    salePost.city = city;
+    salePost.condition = condition;
+    salePost.isNegotiable = isNegotiable;
 
     await salePost.save();
     return res.status(200).json({ result: true, salePost });
