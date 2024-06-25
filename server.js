@@ -7,10 +7,8 @@ const myPageRoute = require('./routes/myPageRoute');
 // register test area
 const testRegisterRoute = require('./routes/testRegisterRoute');
 
-
-const db = require('./utils/db');
+const db = require('./db/connectDB');
 require('dotenv').config();
-
 
 const mongoose = require('mongoose');
 const cloudinary = require('cloudinary');
