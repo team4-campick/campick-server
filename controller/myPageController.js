@@ -2,6 +2,7 @@ const Inquiry = require('../models/Inquiry');
 // const Post = require('../models/Post');
 const User = require('../models/User');
 // const Review = require('../models/Review');
+const Bingo = require('../models/Bingo');
 const UserServices = require('../services/userServices');
 const {
   getPostCount,
@@ -9,7 +10,9 @@ const {
   getMissionClear,
   getBingoCount,
 } = require('../services/bingoService');
-const { default: bingoMission } = require('../utils/bingoMission');
+const { bingoMission } = require('../utils/bingoMission');
+const { syncBingo } = require('../utils/syncBingo');
+const bingoService = require('../services/bingoService');
 
 exports.updateInquiry = async (req, res) => {
   try {
@@ -86,7 +89,7 @@ exports.passwordCheck = async (req, res) => {
 exports.updateMission = async (req, res) => {
   try {
     const username = req.params.id;
-    const mission = req.body;
+    // const mission = req.body;
     // const reviewCount = await ;
     const userInfo = await User.findOne({ username });
     // userInfo 찾은 부분도 service 단으로 옮겨야할듯.
@@ -94,8 +97,9 @@ exports.updateMission = async (req, res) => {
     const reviewCount = await getReviewCount(userInfo._id);
     const missionClear = await getMissionClear(userInfo._id);
     const bingoCount = await getBingoCount(userInfo._id);
+    console.log('나와라이~', reviewCount);
     // 연속 접속 함수 미 구현상태임.
-    const continuousConnection = 0;
+    const continuousConnection = 7;
     const newMission = {
       postCount,
       reviewCount,
@@ -104,20 +108,34 @@ exports.updateMission = async (req, res) => {
       continuousConnection,
     };
     const checkedMission = bingoMission(newMission);
-    const updatedMission = await UserServices.updateMission(
+    const bingo = await Bingo.findOne({ _id: userInfo._id });
+    const mission = await UserServices.updateMissionList(
       userInfo._id,
-      checkedMission
+      newMission
     );
-    console.log('updatedMission', updatedMission);
-    res.status(200).json({ success: true });
+    const updatedBingo = syncBingo(bingo, checkedMission);
+    await Bingo.findOneAndUpdate({ _id: userInfo._id }, { $set: updatedBingo });
+    res.status(200).json({ mission, bingo: updatedBingo });
   } catch (error) {
     console.error(error);
   }
 };
-exports.bingoStatusCheck = async (req, res) => {
+exports.getBingo = async (req, res) => {
   try {
-    const userId = req.params.id;
-    // const bingo = await Bingo.findOne({ userId });
+    const username = req.params.id;
+    const userInfo = await User.findOne({ username });
+    const bingo = await Bingo.findOne({ _id: userInfo._id });
+    res.status(200).json({ bingo });
+  } catch (error) {
+    console.error(error);
+  }
+};
+exports.getBingoCount = async (req, res) => {
+  try {
+    const username = req.params.id;
+    const userInfo = await User.findOne({ username });
+    const bingoCount = await bingoService.getBingoCount(userInfo._id);
+    res.status(200).json({ bingoCount });
   } catch (error) {
     console.error(error);
   }

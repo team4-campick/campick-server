@@ -1,6 +1,7 @@
 exports.missionClearCounter = (bingoArea) => {
   let count = 0;
-  bingoArea.forEach((e) => {
+  console.log('bingoArea', bingoArea);
+  Array.from(bingoArea.bingo).forEach((e) => {
     if (e.state === 1) count++;
   });
   return count;

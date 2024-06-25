@@ -8,12 +8,12 @@ const authRoutes = require("./routes/authRoutes");
 // register test area
 const testRegisterRoute = require("./routes/testRegisterRoute");
 
-const db = require("./utils/db");
-require("dotenv").config();
+const db = require('./db/connectDB');
+require('dotenv').config();
 
-const mongoose = require("mongoose");
-const cloudinary = require("cloudinary");
-require("dotenv").config();
+const mongoose = require('mongoose');
+const cloudinary = require('cloudinary');
+require('dotenv').config();
 
 // Cloudinary 설정
 cloudinary.config({

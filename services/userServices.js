@@ -45,13 +45,13 @@ class UserService {
       throw new Error('Wrong username or password');
     }
   }
-  async updateMission(username, mission) {
-    const user = await User.findOne({ username });
+  async updateMissionList(_id, newMission) {
+    const user = await User.findOne({ _id });
     const updatedMission = await Mission.findOneAndUpdate(
       { _id: user._id },
-      { mission: mission.body }
+      { mission: newMission },
+      { new: true }
     );
-    console.log('updatedMission', updatedMission);
     return updatedMission;
   }
 }

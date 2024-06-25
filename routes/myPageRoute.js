@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const myPageController = require('../controller/myPageController');
-// const bookController = require('../controllers/bookController');
 
 router.get('/get-user/:id', myPageController.getUser);
 
@@ -12,13 +11,8 @@ router.post('/duplicateCheck', myPageController.duplicateCheck);
 router.post('/passwordCheck/:id', myPageController.passwordCheck);
 router.post('/editInfo/:id', myPageController.updateUser);
 
-router.get('/get-bingo/:id', myPageController.bingoStatusCheck);
+// router.get('/get-bingo/:id', myPageController.getBingo);
+router.post('/bingo-count/:id', myPageController.getBingoCount);
 router.post('/update-mission/:id', myPageController.updateMission);
-
-// router.get('/', bookController.getAllBooks);
-// router.post('/', bookController.createBook);
-// router.get('/:id', bookController.getBookById);
-// router.put('/:id', bookController.updateBook);
-// router.delete('/:id', bookController.deleteBook);
 
 module.exports = router;
