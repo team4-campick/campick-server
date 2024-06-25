@@ -1,5 +1,15 @@
 const Inquiry = require('../models/Inquiry');
+// const Post = require('../models/Post');
+const User = require('../models/User');
+// const Review = require('../models/Review');
 const UserServices = require('../services/userServices');
+const {
+  getPostCount,
+  getReviewCount,
+  getMissionClear,
+  getBingoCount,
+} = require('../services/bingoService');
+const { default: bingoMission } = require('../utils/bingoMission');
 
 exports.updateInquiry = async (req, res) => {
   try {
@@ -73,11 +83,41 @@ exports.passwordCheck = async (req, res) => {
     res.status(401).json({ success: false, message: error.message });
   }
 };
-
+exports.updateMission = async (req, res) => {
+  try {
+    const username = req.params.id;
+    const mission = req.body;
+    // const reviewCount = await ;
+    const userInfo = await User.findOne({ username });
+    // userInfo 찾은 부분도 service 단으로 옮겨야할듯.
+    const postCount = await getPostCount(userInfo._id);
+    const reviewCount = await getReviewCount(userInfo._id);
+    const missionClear = await getMissionClear(userInfo._id);
+    const bingoCount = await getBingoCount(userInfo._id);
+    // 연속 접속 함수 미 구현상태임.
+    const continuousConnection = 0;
+    const newMission = {
+      postCount,
+      reviewCount,
+      missionClear,
+      bingoCount,
+      continuousConnection,
+    };
+    const checkedMission = bingoMission(newMission);
+    const updatedMission = await UserServices.updateMission(
+      userInfo._id,
+      checkedMission
+    );
+    console.log('updatedMission', updatedMission);
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error(error);
+  }
+};
 exports.bingoStatusCheck = async (req, res) => {
   try {
     const userId = req.params.id;
-    const bingo = await Bingo.findOne({ userId });
+    // const bingo = await Bingo.findOne({ userId });
   } catch (error) {
     console.error(error);
   }

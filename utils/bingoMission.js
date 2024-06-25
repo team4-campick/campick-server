@@ -1,6 +1,12 @@
-const bingoMission = (mission) => {
-  const { reviewCount, postCount, missionClear, bingoCount } = mission;
-  const bingoArea = [
+exports.bingoMission = (mission) => {
+  const {
+    reviewCount,
+    postCount,
+    missionClear,
+    bingoCount,
+    continuousConnection,
+  } = mission;
+  const bingoMission = [
     { mission: 1, state: reviewCount >= 3 ? 1 : 0 },
     { mission: 2, state: postCount >= 2 ? 1 : 0 },
     { mission: 3, state: missionClear >= 3 ? 1 : 0 },
@@ -11,7 +17,5 @@ const bingoMission = (mission) => {
     { mission: 8, state: missionClear >= 6 ? 1 : 0 },
     { mission: 9, state: continuousConnection >= 7 ? 1 : 0 },
   ];
-  return bingoArea;
+  return bingoMission;
 };
-
-export default bingoMission;

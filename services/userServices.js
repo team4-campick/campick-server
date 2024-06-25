@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const hash = require('../utils/encrypt');
+const Mission = require('../models/Mission');
 
 class UserService {
   async getUserData(userId) {
@@ -43,6 +44,15 @@ class UserService {
     } else {
       throw new Error('Wrong username or password');
     }
+  }
+  async updateMission(username, mission) {
+    const user = await User.findOne({ username });
+    const updatedMission = await Mission.findOneAndUpdate(
+      { _id: user._id },
+      { mission: mission.body }
+    );
+    console.log('updatedMission', updatedMission);
+    return updatedMission;
   }
 }
 module.exports = new UserService();
