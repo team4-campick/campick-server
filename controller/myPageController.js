@@ -9,6 +9,7 @@ const {
   getReviewCount,
   getMissionClear,
   getBingoCount,
+  getContinuousConnection,
 } = require('../services/bingoService');
 const { bingoMission } = require('../utils/bingoMission');
 const { syncBingo } = require('../utils/syncBingo');
@@ -90,16 +91,21 @@ exports.updateMission = async (req, res) => {
   try {
     const username = req.params.id;
     // const mission = req.body;
-    // const reviewCount = await ;
     const userInfo = await User.findOne({ username });
     // userInfo 찾은 부분도 service 단으로 옮겨야할듯.
     const postCount = await getPostCount(userInfo._id);
     const reviewCount = await getReviewCount(userInfo._id);
     const missionClear = await getMissionClear(userInfo._id);
     const bingoCount = await getBingoCount(userInfo._id);
-    console.log('나와라이~', reviewCount);
-    // 연속 접속 함수 미 구현상태임.
-    const continuousConnection = 7;
+    const continuousConnection = await getContinuousConnection(userInfo._id);
+
+    // 아래부분은 빙고 패턴 테스트를 위한 테스트 데이터임.
+    // const postCount = 4;
+    // const reviewCount = 5;
+    // const missionClear = await getMissionClear(userInfo._id);
+    // const bingoCount = await getBingoCount(userInfo._id);
+    // const continuousConnection = 7;
+
     const newMission = {
       postCount,
       reviewCount,
@@ -109,11 +115,11 @@ exports.updateMission = async (req, res) => {
     };
     const checkedMission = bingoMission(newMission);
     const bingo = await Bingo.findOne({ _id: userInfo._id });
-    const mission = await UserServices.updateMissionList(
+    const mission = await bingoService.updateMissionList(
       userInfo._id,
       newMission
     );
-    const updatedBingo = syncBingo(bingo, checkedMission);
+    const updatedBingo = await syncBingo(bingo, checkedMission);
     await Bingo.findOneAndUpdate({ _id: userInfo._id }, { $set: updatedBingo });
     res.status(200).json({ mission, bingo: updatedBingo });
   } catch (error) {
@@ -140,22 +146,38 @@ exports.getBingoCount = async (req, res) => {
     console.error(error);
   }
 };
-exports.bingoStatusUpdate = async (req, res) => {
+exports.getBingoPattern = async (req, res) => {
   try {
-    /**
-     * 미션 달성되면 해당 미션의 빙고칸을 달성 혹은 clear 등으로 상태를 업데이트 하자.
-     */
+    const username = req.params.id;
+    const userInfo = await User.findOne({ username });
+    const bingoPattern = await bingoService.getBingoPattern(userInfo._id);
+    console.log('보내기 직전', bingoPattern);
+    res.status(200).json({ bingoPattern });
   } catch (error) {
     console.error(error);
   }
 };
+/**
+ * 미션 달성되면 해당 미션의 빙고칸을 달성 혹은 clear 등으로 상태를 업데이트 하자.
+ */
+exports.bingoStatusUpdate = async (req, res) => {
+  try {
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+/**
+ * 9칸이 다 찼을 경우 빙고판을 리셋 => 클라이언트 단에서 버튼 하나 만들어서
+ * 빙고가 완성되었습니다. 게임을 다시 하려면 버튼을 클릭해주세요 를 해두고 클릭시
+ * 초기화 하는 방식으로 진해할 예정
+ * */
 exports.bingoStatusReset = async (req, res) => {
   try {
-    /**
-     * 9칸이 다 찼을 경우 빙고판을 리셋 => 클라이언트 단에서 버튼 하나 만들어서
-     * 빙고가 완성되었습니다. 게임을 다시 하려면 버튼을 클릭해주세요 를 해두고 클릭시
-     * 초기화 하는 방식으로 진해할 예정
-     * */
+    const username = req.params.id;
+    const userInfo = await User.findOne({ username });
+    const bingo = await bingoService.resetBingo(userInfo._id);
+    res.status(200).json({ bingo });
   } catch (error) {
     console.error(error);
   }
