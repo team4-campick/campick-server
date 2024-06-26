@@ -3,8 +3,10 @@ const SalePost = require('../models/salePostModel.js');
 const { cloudinaryUpload } = require('../utils/fileUpload.js');
 
 const getSalePosts = async (req, res) => {
-  if (req.query.category) {
-    const { category } = req.query;
+  const { category, keyword } = req.query;
+  console.log(keyword);
+
+  if (category) {
     try {
       const salePosts = await SalePost.find({ category });
       if (salePosts.length === 0) {
@@ -12,6 +14,28 @@ const getSalePosts = async (req, res) => {
           .status(404)
           .json({ result: false, message: '게시물이 존재하지 않습니다.' });
       }
+      return res.status(200).json({ result: true, salePosts });
+    } catch (error) {
+      return res.status(500).json({
+        result: false,
+        message: '잠시후 다시 시도해주세요.',
+      });
+    }
+  }
+
+  if (keyword) {
+    // 키워드 일부를 포함
+    const regex = new RegExp(keyword, 'i');
+
+    try {
+      // 키워드가 포함된 데이터를 find
+      const salePosts = await SalePost.find({ productName: regex });
+      if (salePosts.length === 0) {
+        return res
+          .status(404)
+          .json({ result: false, message: '게시물이 존재하지 않습니다.' });
+      }
+
       return res.status(200).json({ result: true, salePosts });
     } catch (error) {
       return res.status(500).json({
