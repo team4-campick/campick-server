@@ -14,10 +14,10 @@ const userSchema = new mongoose.Schema({
     required: true,
     // unique: true,
   },
-  // loginDate: {
-  //   type: Object,
-  //   required: true,
-  // },
+  loginDate: {
+    type: Array,
+    required: true,
+  },
   // time form "2011-10-05T14:48:00.000Z"
 });
 const User = mongoose.model('User', userSchema);
