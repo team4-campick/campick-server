@@ -3,20 +3,24 @@ const Mission = require('../models/Mission');
 const Review = require('../models/Review');
 const Post = require('../models/Post');
 const Bingo = require('../models/Bingo');
+
+const { shuffle } = require('../utils/shuffle');
 const { bingoRule } = require('../utils/bingoRule');
 const { missionClearCounter } = require('../utils/missionClearCounter');
+const { consecutiveVisitDays } = require('../utils/consecutiveVisitDays');
+
+const { BINGO_AREA } = require('../constants/bingoArea');
 
 class BingoService {
-  async getMissionStatus(_id) {
-    const mission = await Mission.findOne({ _id });
-    return mission;
-  }
-  async updateMissionStatus(_id, mission) {
-    console.log('mission check : ', mission);
-    const updatedMission = await Mission.findOneAndUpdate({ _id }, { mission });
-    return updatedMission;
-  }
-  // ================== mission variable status handling =================== //
+  // async getMissionStatus(_id) {
+  //   const mission = await Mission.findOne({ _id });
+  //   return mission;
+  // }
+  // async updateMissionStatus(_id, mission) {
+  //   console.log('mission check : ', mission);
+  //   const updatedMission = await Mission.findOneAndUpdate({ _id }, { mission });
+  //   return updatedMission;
+  // }
   async getReviewCount(_id) {
     const review = (await Review.findOne({ _id }))
       ? await Review.findOne({ _id })
@@ -46,13 +50,37 @@ class BingoService {
   }
   async getBingoCount(_id) {
     const getBingo = await Bingo.findOne({ _id });
-    const count = bingoRule(getBingo.bingo);
+    const count = bingoRule(getBingo.bingo).count;
     return count;
+  }
+  async getBingoPattern(_id) {
+    const getBingo = await Bingo.findById({ _id });
+    const pattern = bingoRule(getBingo.bingo).bingoPattern;
+    console.log('bingo pattern', pattern);
+    return pattern;
   }
   async getContinuousConnection(_id) {
     const user = await User.findOne({ _id });
-    return user;
+    const loginDate = user ? user.loginDate : null;
+    const count = loginDate ? consecutiveVisitDays(loginDate) : 1;
+    return count;
   }
-  // ====================== mission variable status handling ===================
+  async updateMissionList(_id, newMission) {
+    const user = await User.findOne({ _id });
+    const updatedMission = await Mission.findOneAndUpdate(
+      { _id: user._id },
+      { mission: newMission },
+      { new: true }
+    );
+    return updatedMission;
+  }
+  async resetBingo(_id) {
+    const user = await User.findOne({ _id });
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: user._id },
+      { bingo: shuffle(BINGO_AREA) }
+    );
+    return updatedUser;
+  }
 }
 module.exports = new BingoService();
