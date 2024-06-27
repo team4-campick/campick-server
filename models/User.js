@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema({
     // unique: true,
   },
   loginDate: {
-    type: [Date], // 배열 형태로 변경
+    type: String, // 문자열로 원상복귀
     required: true,
   },
   // time form "2011-10-05T14:48:00.000Z"
