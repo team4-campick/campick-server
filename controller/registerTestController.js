@@ -30,7 +30,11 @@ exports.registerUser = async (req, res) => {
     });
     const ms = await Mission.create({
       _id: tr._id,
-      mission: MISSION,
+      postCount: 0,
+      reviewCount: 0,
+      missionClear: 0,
+      bingoCount: 0,
+      continuousConnection: 1,
     });
     console.log('user', tr);
     console.log('bingo', bg);
