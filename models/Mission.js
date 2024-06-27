@@ -6,23 +6,23 @@ const missionSchema = new mongoose.Schema({
   //   required: true,
   // },
   postCount: {
-    type: Int32,
+    type: Number,
     required: true,
   },
   reviewCount: {
-    type: Int32,
+    type: Number,
     required: true,
   },
   missionClear: {
-    type: Int32,
+    type: Number,
     required: true,
   },
   bingoCount: {
-    type: Int32,
+    type: Number,
     required: true,
   },
   continuousConnection: {
-    type: Int32,
+    type: Number,
     required: true,
   },
   /**
