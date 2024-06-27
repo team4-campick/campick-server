@@ -1,3 +1,7 @@
+const Bingo = require('../models/Bingo');
+const Mission = require('../models/Mission');
+const Post = require('../models/Post');
+const Review = require('../models/Review');
 const User = require('../models/User');
 const hash = require('../utils/encrypt');
 
@@ -8,8 +12,12 @@ class UserService {
   }
   async deleteUser(username) {
     console.log('userId :', username);
-    const test = await User.findOneAndDelete({ username });
-    console.log('test', test);
+    const user = await User.findOneAndDelete({ username });
+    await Bingo.findByIdAndDelete(user._id);
+    await Mission.findByIdAndDelete(user._id);
+    await Post.findByIdAndDelete(user._id);
+    await Review.findByIdAndDelete(user._id);
+    console.log('test', user);
     return { message: 'User successfully deleted' };
   }
   async duplicateNickname(nickname) {
