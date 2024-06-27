@@ -58,6 +58,14 @@ const login = async (req, res) => {
       { $push: { loginDate } },
       { new: true, useFindAndModify: false }
     );
+
+    // 쿠키 설정
+    res.cookie("token", token, {
+      httpOnly: true, // 클라이언트 측 자바스크립트에서 쿠키 접근을 방지
+      secure: process.env.NODE_ENV === "production", // 프로덕션 환경에서는 HTTPS를 통해서만 쿠키 전송
+      maxAge: 3600000, // 쿠키 만료 시간 (1시간)
+    });
+
     return res.json({ id: user._id, token });
   } catch (error) {
     console.error("Error logging in:", error);
