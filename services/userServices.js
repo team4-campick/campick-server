@@ -2,9 +2,8 @@ const User = require('../models/User');
 const hash = require('../utils/encrypt');
 
 class UserService {
-  async getUserData(userId) {
-    const user = await User.findOne({ userId });
-    console.log('func user', user);
+  async getUserData(username) {
+    const user = await User.findOne({ username });
     return user;
   }
   async deleteUser(username) {
