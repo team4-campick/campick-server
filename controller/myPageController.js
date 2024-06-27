@@ -95,18 +95,18 @@ exports.updateMission = async (req, res) => {
     // const mission = req.body;
     const userInfo = await User.findOne({ username });
     // userInfo 찾은 부분도 service 단으로 옮겨야할듯.
-    // const postCount = await getPostCount(userInfo._id);
-    // const reviewCount = await getReviewCount(userInfo._id);
-    // const missionClear = await getMissionClear(userInfo._id);
-    // const bingoCount = await getBingoCount(userInfo._id);
-    // const continuousConnection = await getContinuousConnection(userInfo._id);
-
-    // 아래부분은 빙고 패턴 테스트를 위한 테스트 데이터임.
-    const postCount = 6;
-    const reviewCount = 10;
+    const postCount = await getPostCount(userInfo._id);
+    const reviewCount = await getReviewCount(userInfo._id);
     const missionClear = await getMissionClear(userInfo._id);
     const bingoCount = await getBingoCount(userInfo._id);
-    const continuousConnection = 7;
+    const continuousConnection = await getContinuousConnection(userInfo._id);
+
+    // 아래부분은 빙고 패턴 테스트를 위한 테스트 데이터임.
+    // const postCount = 6;
+    // const reviewCount = 10;
+    // const missionClear = await getMissionClear(userInfo._id);
+    // const bingoCount = await getBingoCount(userInfo._id);
+    // const continuousConnection = 7;
     // const findValue = await Mission.findOne({ _id: userInfo._id });
     // const continuousConnection = findValue.mission.continuousConnection;
 
