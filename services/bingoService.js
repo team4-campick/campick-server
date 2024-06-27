@@ -99,7 +99,7 @@ class BingoService {
         reviewCount: newMission.reviewCount,
         missionClear: newMission.missionClear,
         bingoCount: newMission.bingoCount,
-        consecutiveVisitDays: newMission.continuousConnection,
+        continuousConnection: newMission.continuousConnection,
       },
       { new: true }
     );
