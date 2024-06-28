@@ -55,9 +55,8 @@ const login = async (req, res) => {
     });
 
     await User.findByIdAndUpdate(
-      user._id,
-      { loginDate: new Date().toISOString() }, // 문자열로 업데이트
-      { new: true, useFindAndModify: false }
+      user,
+      { $push: { loginDate } },
     );
 
     // 쿠키 설정
