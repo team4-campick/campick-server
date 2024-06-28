@@ -53,9 +53,10 @@ const login = async (req, res) => {
     const token = jwt.sign({ id: user._id }, "your_jwt_secret", {
       expiresIn: "1h",
     });
+
     await User.findByIdAndUpdate(
-      user,
-      { $push: { loginDate } },
+      user._id,
+      { loginDate: new Date().toISOString() }, // 문자열로 업데이트
       { new: true, useFindAndModify: false }
     );
 
