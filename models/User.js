@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -15,12 +15,12 @@ const userSchema = new mongoose.Schema({
     // unique: true,
   },
   loginDate: {
-    type: String, // 문자열로 원상복귀
+    type: Array,
     required: true,
   },
   // time form "2011-10-05T14:48:00.000Z"
 });
 
-const User = mongoose.model("User", userSchema);
+const User = mongoose.model('User', userSchema);
 
 module.exports = User;
