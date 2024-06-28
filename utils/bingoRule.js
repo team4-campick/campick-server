@@ -11,7 +11,7 @@ exports.bingoRule = (bingoArea) => {
     pattern.every((index) => bingoArea[index].state === 1);
   BINGO_PATTERN.forEach((pattern, i) => {
     if (isBingo(pattern)) {
-      data.bingoPattern[i] = pattern;
+      data.bingoPattern[i] = 1;
       data.count++;
     }
   });
