@@ -1,9 +1,15 @@
 // controller/authController.js
+const express = require("express");
+const app = express();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
+
 const User = require("../models/User");
 
 const users = []; // 임시로 메모리에 사용자 데이터를 저장합니다.
+
+app.use(cookieParser());
 
 // 회원가입 함수
 const register = async (req, res) => {
@@ -36,9 +42,6 @@ const register = async (req, res) => {
 // 로그인 함수
 const login = async (req, res) => {
   const { username, password, loginDate } = req.body;
-  login;
-  console.log(username, password);
-
   try {
     const user = await User.findOne({ username });
     if (!user) {
@@ -49,28 +52,46 @@ const login = async (req, res) => {
     if (!validPassword) {
       return res.status(400).json({ message: "failed" });
     }
-
-    const token = jwt.sign({ id: user._id }, "your_jwt_secret", {
+    const token = jwt.sign({ username, id: user._id }, "your_jwt_secret", {
       expiresIn: "1h",
     });
 
-    await User.findByIdAndUpdate(
-      user,
-      { $push: { loginDate } },
-    );
+    await User.findByIdAndUpdate(user, { $push: { loginDate } });
 
     // 쿠키 설정
-    res.cookie("token", token, {
-      httpOnly: true, // 클라이언트 측 자바스크립트에서 쿠키 접근을 방지
-      secure: process.env.NODE_ENV === "production", // 프로덕션 환경에서는 HTTPS를 통해서만 쿠키 전송
-      maxAge: 3600000, // 쿠키 만료 시간 (1시간)
-    });
-
-    return res.json({ id: user._id, token });
+    res
+      .cookie("token", token, {
+        httpOnly: true, // 클라이언트 측 자바스크립트에서 쿠키 접근을 방지
+        secure: process.env.NODE_ENV === "production", // 프로덕션 환경에서는 HTTPS를 통해서만 쿠키 전송
+        maxAge: 3600000, // 쿠키 만료 시간 (1시간)
+      })
+      .json({
+        id: user._id,
+        username,
+      });
   } catch (error) {
     console.error("Error logging in:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: "Internal server error" });
   }
 };
-
-module.exports = { register, login };
+const logout = (req, res) => {
+  res.cookie("token", "").json();
+};
+const profile = async (req, res) => {
+  const { token } = req.cookies;
+  console.log("profile 탐색");
+  if (!token) {
+    res.json("토큰정보가 없어요");
+    return;
+  }
+  try {
+    jwt.verify(token, "your_jwt_secret", {}, (err, info) => {
+      if (err) throw err;
+      console.log("info:", info);
+      res.json(info);
+    });
+  } catch (error) {
+    res.json("유효하지 않는 토큰 정보입니다.");
+  }
+};
+module.exports = { register, login, logout, profile };

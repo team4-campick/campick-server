@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const missionSchema = new mongoose.Schema({
   // mission: {
@@ -51,6 +51,6 @@ const missionSchema = new mongoose.Schema({
    *
    */
 });
-const Mission = mongoose.model('Mission', missionSchema);
+const Mission = mongoose.model("Mission", missionSchema);
 
 module.exports = Mission;

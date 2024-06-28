@@ -4,16 +4,16 @@ const bodyParser = require("body-parser");
 const salePostRoutes = require("./routes/salePostRoutes");
 const myPageRoute = require("./routes/myPageRoute");
 const authRoutes = require("./routes/authRoutes");
-
+const cookieParser = require("cookie-parser");
 // register test area
 const testRegisterRoute = require("./routes/testRegisterRoute");
 
-const db = require('./db/connectDB');
-require('dotenv').config();
+const db = require("./db/connectDB");
+require("dotenv").config();
 
-const mongoose = require('mongoose');
-const cloudinary = require('cloudinary');
-require('dotenv').config();
+const mongoose = require("mongoose");
+const cloudinary = require("cloudinary");
+require("dotenv").config();
 
 // Cloudinary 설정
 cloudinary.config({
@@ -29,6 +29,7 @@ const clientPort = process.env.CLIENT_PORT_NUM;
 app.use(cors({ credentials: true, origin: `http://localhost:${clientPort}` }));
 app.use(express.json());
 app.use("/api/sale-posts", salePostRoutes);
+app.use(cookieParser());
 
 // register test area
 app.use("/", testRegisterRoute);

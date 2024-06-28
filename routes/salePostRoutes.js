@@ -1,18 +1,18 @@
-const { Router } = require('express');
+const { Router } = require("express");
 const {
   getSalePosts,
   getSalePostById,
   createSalePost,
   updateSalePost,
   deleteSalePost,
-} = require('../controller/salePostController.js');
-const { fileUpload } = require('../utils/fileUpload.js');
+} = require("../controller/salePostController.js");
+const { fileUpload } = require("../utils/fileUpload.js");
 
 const router = Router();
-router.route('/').get(getSalePosts);
-router.route('/').post(fileUpload.array('images'), createSalePost);
+router.route("/").get(getSalePosts);
+router.route("/").post(fileUpload.array("images"), createSalePost);
 router
-  .route('/:id')
+  .route("/:id")
   .get(getSalePostById)
   .put(updateSalePost)
   .delete(deleteSalePost);

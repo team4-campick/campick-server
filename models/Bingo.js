@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const bingoSchema = new mongoose.Schema({
   bingo: {
@@ -6,6 +6,6 @@ const bingoSchema = new mongoose.Schema({
     required: true,
   },
 });
-const Bingo = mongoose.model('Bingo', bingoSchema);
+const Bingo = mongoose.model("Bingo", bingoSchema);
 
 module.exports = Bingo;
