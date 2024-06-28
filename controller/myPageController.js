@@ -1,9 +1,9 @@
-const Inquiry = require('../models/Inquiry');
+const Inquiry = require("../models/Inquiry");
 // const Post = require('../models/Post');
-const User = require('../models/User');
+const User = require("../models/User");
 // const Review = require('../models/Review');
-const Bingo = require('../models/Bingo');
-const UserServices = require('../services/userServices');
+const Bingo = require("../models/Bingo");
+const UserServices = require("../services/userServices");
 const {
   getPostCount,
   getReviewCount,
@@ -12,33 +12,33 @@ const {
   getContinuousConnection,
   updateBingoMission,
   updateMissionList,
-} = require('../services/bingoService');
-const { bingoMission } = require('../utils/bingoMission');
-const { syncBingo } = require('../utils/syncBingo');
-const bingoService = require('../services/bingoService');
+} = require("../services/bingoService");
+const { bingoMission } = require("../utils/bingoMission");
+const { syncBingo } = require("../utils/syncBingo");
+const bingoService = require("../services/bingoService");
 
 exports.updateInquiry = async (req, res) => {
   try {
     const { title, email, content } = req.body;
     const inquiryDoc = await Inquiry.create({ title, email, content });
-    console.log('inquiryDoc', inquiryDoc);
+    console.log("inquiryDoc", inquiryDoc);
     res.status(200).json(userDoc);
   } catch (error) {
-    res.status(400).json({ error: 'Invalid request' });
+    res.status(400).json({ error: "Invalid request" });
   }
 };
 exports.updateUser = async (req, res) => {
   try {
     const username = req.params.id;
     const { nickname, password } = req.body;
-    console.log('test', username);
+    console.log("test", username);
     console.log(nickname, password);
     const userDoc = await UserServices.updateUserData(
       username,
       nickname,
       password
     );
-    console.log('userDoc', userDoc);
+    console.log("userDoc", userDoc);
     res.status(200).json({ success: true });
   } catch (error) {
     console.error(error);
@@ -48,8 +48,8 @@ exports.getUser = async (req, res) => {
   try {
     const userId = req.params.id;
     const userDoc = await UserServices.getUserData(userId);
-    console.log('userId', userId);
-    console.log('userDoc', userDoc);
+    console.log("userId", userId);
+    console.log("userDoc", userDoc);
     res.status(200).json({ success: true, userDoc });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -58,7 +58,7 @@ exports.getUser = async (req, res) => {
 exports.deleteUser = async (req, res) => {
   try {
     const userId = req.params.id;
-    console.log('test', userId);
+    console.log("test", userId);
     const deletedUser = await UserServices.deleteUser(userId);
     res.status(200).json({ success: true, message: deletedUser.message });
   } catch (error) {
@@ -83,7 +83,7 @@ exports.passwordCheck = async (req, res) => {
     const { password } = req.body;
     console.log(username, password);
     const userDoc = await UserServices.passwordCheck(username, password);
-    console.log('userDoc222', userDoc);
+    console.log("userDoc222", userDoc);
     res.status(200).json({ success: true });
   } catch (error) {
     res.status(401).json({ success: false, message: error.message });
@@ -120,7 +120,7 @@ exports.updateMission = async (req, res) => {
     const checkedMission = bingoMission(newMission);
     // const update = await updateBingoMission(userInfo._id, checkedMission);
     console.log(checkedMission);
-    console.log('@@@@@@@@@@@@@@@@@@@@@@@@', newMission);
+    console.log("@@@@@@@@@@@@@@@@@@@@@@@@", newMission);
     const bingo = await Bingo.findById(userInfo._id);
     const mission = await updateMissionList(userInfo._id, newMission);
     const updatedBingo = await syncBingo(bingo, checkedMission);
@@ -155,7 +155,7 @@ exports.getBingoPattern = async (req, res) => {
     const username = req.params.id;
     const userInfo = await User.findOne({ username });
     const bingoPattern = await bingoService.getBingoPattern(userInfo._id);
-    console.log('보내기 직전', bingoPattern);
+    console.log("보내기 직전", bingoPattern);
     res.status(200).json({ bingoPattern });
   } catch (error) {
     console.error(error);

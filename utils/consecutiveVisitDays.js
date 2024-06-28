@@ -14,11 +14,11 @@ exports.consecutiveVisitDays = (dateArr) => {
     const diff = convertedDateArray[i + 1] - convertedDateArray[i];
     diff === 1 ? true : false;
     if (!diff) {
-      console.log('연속접속 아님.');
+      console.log("연속접속 아님.");
       return diff;
     }
     count++;
   }
-  console.log('연속접속일 : ', count);
+  console.log("연속접속일 : ", count);
   return count;
 };

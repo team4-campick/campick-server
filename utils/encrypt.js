@@ -1,5 +1,5 @@
-const bcrypt = require('bcryptjs');
-require('dotenv').config();
+const bcrypt = require("bcryptjs");
+require("dotenv").config();
 
 exports.encrypt = (password) => {
   try {

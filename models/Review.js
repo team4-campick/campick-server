@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const reviewSchema = new mongoose.Schema({
   review: {
@@ -7,7 +7,7 @@ const reviewSchema = new mongoose.Schema({
     maxlength: 200,
   },
 });
-reviewSchema.set('timestamps', true);
-const Review = mongoose.model('Review', reviewSchema);
+reviewSchema.set("timestamps", true);
+const Review = mongoose.model("Review", reviewSchema);
 
 module.exports = Review;
