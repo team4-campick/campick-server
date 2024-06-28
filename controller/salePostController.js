@@ -1,6 +1,6 @@
-const fs = require('fs');
-const SalePost = require('../models/salePostModel.js');
-const { cloudinaryUpload } = require('../utils/fileUpload.js');
+const fs = require("fs");
+const SalePost = require("../models/salePostModel.js");
+const { cloudinaryUpload } = require("../utils/fileUpload.js");
 
 const getSalePosts = async (req, res) => {
   const { category, keyword } = req.query;
@@ -12,20 +12,20 @@ const getSalePosts = async (req, res) => {
       if (salePosts.length === 0) {
         return res
           .status(404)
-          .json({ result: false, message: '게시물이 존재하지 않습니다.' });
+          .json({ result: false, message: "게시물이 존재하지 않습니다." });
       }
       return res.status(200).json({ result: true, salePosts });
     } catch (error) {
       return res.status(500).json({
         result: false,
-        message: '잠시후 다시 시도해주세요.',
+        message: "잠시후 다시 시도해주세요.",
       });
     }
   }
 
   if (keyword) {
     // 키워드 일부를 포함
-    const regex = new RegExp(keyword, 'i');
+    const regex = new RegExp(keyword, "i");
 
     try {
       // 키워드가 포함된 데이터를 find
@@ -33,14 +33,14 @@ const getSalePosts = async (req, res) => {
       if (salePosts.length === 0) {
         return res
           .status(404)
-          .json({ result: false, message: '게시물이 존재하지 않습니다.' });
+          .json({ result: false, message: "게시물이 존재하지 않습니다." });
       }
 
       return res.status(200).json({ result: true, salePosts });
     } catch (error) {
       return res.status(500).json({
         result: false,
-        message: '잠시후 다시 시도해주세요.',
+        message: "잠시후 다시 시도해주세요.",
       });
     }
   }
@@ -52,7 +52,7 @@ const getSalePosts = async (req, res) => {
     console.log(error);
     return res.status(500).json({
       result: false,
-      message: '게시물 조회에 실패했습니다. 잠시후 다시 시도해주세요.',
+      message: "게시물 조회에 실패했습니다. 잠시후 다시 시도해주세요.",
     });
   }
 };
@@ -65,7 +65,7 @@ const getSalePostById = async (req, res) => {
     if (!salePost) {
       return res
         .status(404)
-        .json({ result: false, message: '게시물이 존재하지 않습니다.' });
+        .json({ result: false, message: "게시물이 존재하지 않습니다." });
     }
 
     return res.status(200).json({ result: true, salePost });
@@ -73,7 +73,7 @@ const getSalePostById = async (req, res) => {
     console.log(error);
     return res.status(500).json({
       result: false,
-      message: '게시물 조회에 실패했습니다. 잠시후 다시 시도해주세요.',
+      message: "게시물 조회에 실패했습니다. 잠시후 다시 시도해주세요.",
     });
   }
 };
@@ -98,9 +98,9 @@ const createSalePost = async (req, res) => {
   try {
     const salePost = new SalePost({
       ...newPost,
-      city: newPost.city ?? '-',
+      city: newPost.city ?? "-",
       imageUrls: [...imageUrls],
-      salesStatus: 'selling',
+      salesStatus: "selling",
     });
 
     await salePost.save();
@@ -109,7 +109,7 @@ const createSalePost = async (req, res) => {
     console.log(error);
     return res.status(500).json({
       result: false,
-      message: '게시물 생성에 실패했습니다. 잠시후 다시 시도해주세요.',
+      message: "게시물 생성에 실패했습니다. 잠시후 다시 시도해주세요.",
     });
   }
 };
@@ -133,7 +133,7 @@ const updateSalePost = async (req, res) => {
     if (!salePost) {
       return res
         .status(404)
-        .json({ result: false, message: '게시물이 존재하지 않습니다.' });
+        .json({ result: false, message: "게시물이 존재하지 않습니다." });
     }
 
     salePost.category = category;
@@ -151,7 +151,7 @@ const updateSalePost = async (req, res) => {
     console.log(error);
     return res.status(500).json({
       result: false,
-      message: '게시물 수정에 실패했습니다. 잠시후 다시 시도해주세요.',
+      message: "게시물 수정에 실패했습니다. 잠시후 다시 시도해주세요.",
     });
   }
 };
@@ -164,19 +164,19 @@ const deleteSalePost = async (req, res) => {
     if (!salePost) {
       return res
         .status(404)
-        .json({ result: false, message: '게시물이 존재하지 않습니다.' });
+        .json({ result: false, message: "게시물이 존재하지 않습니다." });
     }
 
     await SalePost.deleteOne({ _id: id });
 
     return res
       .status(200)
-      .json({ result: true, message: '게시물이 삭제되었습니다.' });
+      .json({ result: true, message: "게시물이 삭제되었습니다." });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
       result: false,
-      message: '게시물 삭제에 실패했습니다. 잠시후 다시 시도해주세요.',
+      message: "게시물 삭제에 실패했습니다. 잠시후 다시 시도해주세요.",
     });
   }
 };
