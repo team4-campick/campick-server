@@ -1,11 +1,18 @@
 // controller/authController.js
 const express = require("express");
 const app = express();
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 
 const User = require("../models/User");
+const Mission = require("../models/Mission");
+const Bingo = require("../models/Bingo");
+
+const { shuffle } = require("../utils/shuffle");
+const { encrypt } = require("../utils/encrypt");
+
+const { BINGO_AREA } = require("../constants/bingoArea");
 
 const users = []; // 임시로 메모리에 사용자 데이터를 저장합니다.
 
@@ -13,30 +20,40 @@ app.use(cookieParser());
 
 // 회원가입 함수
 const register = async (req, res) => {
-  const { username, password, nickname } = req.body;
+  try {
+    const { username, password, nickname } = req.body;
+    console.log("before create", { username, password, nickname });
+    console.log("BINGO_AREA", BINGO_AREA);
+    shuffle(BINGO_AREA);
 
-  // 사용자 유효성 검사
-  if (!username || !password || !nickname) {
-    return res.status(400).json({ message: "모든 필드를 입력하세요." });
+    if (!username || !password || !nickname) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+    const hashedPassword = encrypt(password);
+    const tr = await User.create({
+      username,
+      password: hashedPassword,
+      nickname,
+    });
+    const bg = await Bingo.create({
+      _id: tr._id,
+      bingo: BINGO_AREA,
+    });
+    const ms = await Mission.create({
+      _id: tr._id,
+      postCount: 0,
+      reviewCount: 0,
+      missionClear: 0,
+      bingoCount: 0,
+      continuousConnection: 1,
+    });
+    res.status(200).json({ message: "User created", user: tr });
+  } catch (error) {
+    console.error("Error creating user:", error);
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   }
-
-  // 이미 존재하는 사용자 체크
-  const existingUser = await User.findOne({ username });
-  if (existingUser) {
-    return res.status(400).json({ message: "이미 존재하는 사용자입니다." });
-  }
-
-  // 비밀번호 해싱
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  // 새로운 사용자 추가
-  const newUser = new User({ username, password: hashedPassword, nickname });
-  await newUser.save();
-
-  res.status(201).json({
-    id: newUser._id,
-    message: "회원가입이 성공적으로 완료되었습니다.",
-  });
 };
 
 // 로그인 함수
@@ -48,7 +65,7 @@ const login = async (req, res) => {
       return res.status(404).json({ message: "nouser" });
     }
 
-    const validPassword = await bcrypt.compare(password, user.password);
+    const validPassword = bcrypt.compareSync(password, user.password);
     if (!validPassword) {
       return res.status(400).json({ message: "failed" });
     }

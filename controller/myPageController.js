@@ -19,7 +19,11 @@ const bingoService = require("../services/bingoService");
 
 exports.updateInquiry = async (req, res) => {
   try {
+    // const username = req.params.id;
     const { title, email, content } = req.body;
+    // const user = await User.findOne({username });
+    // 어떤 사람이 작성한건지 구분하는 부분을 추가하면 좋을거 같은데 nickname 으로
+    // 진행하면 닉네임 변경시 하나하나 다 반영해야하는 문제가 있음. 그부분을 어떻게 할까유..
     const inquiryDoc = await Inquiry.create({ title, email, content });
     console.log("inquiryDoc", inquiryDoc);
     res.status(200).json(userDoc);
