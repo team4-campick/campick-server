@@ -113,9 +113,6 @@ class BingoService {
       bingoCount: 0,
       continuousConnection: 1,
     });
-    // const resetMission = await Mission.findByIdAndUpdate(_id, {
-    //   mission: [],
-    // });
     return resetMission;
   }
   async resetBingo(_id) {

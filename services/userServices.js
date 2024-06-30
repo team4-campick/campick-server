@@ -36,16 +36,17 @@ class UserService {
     );
     return user;
   }
-  async passwordCheck(username, password) {
+  async passwordCheck(username, nickname, password) {
     console.log(
       "func username",
-      typeof username,
+      typeof nickname,
       "func password",
       typeof password
     );
     const user = await User.findOne({ username });
+    const validPassword = await bcrypt.compare(password, user.password);
     console.log("user.password : ", user.password);
-    if (user.password === password) {
+    if (validPassword) {
       return true;
     } else {
       throw new Error("Wrong username or password");
