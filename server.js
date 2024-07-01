@@ -5,7 +5,7 @@ const bodyParser = require("body-parser");
 const cloudinary = require("cloudinary");
 
 const salePostRoutes = require("./routes/salePostRoutes");
-const myPageRoute = require("./routes/myPageRoute");
+const myPageRoute = require("./routes/myPageRoutes");
 const authRoutes = require("./routes/authRoutes");
 
 const db = require("./db/connectDB");

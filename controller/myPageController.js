@@ -12,10 +12,10 @@ const {
   getContinuousConnection,
   updateBingoMission,
   updateMissionList,
+  getBingoPattern,
 } = require("../services/bingoService");
 const { bingoMission } = require("../utils/bingoMission");
 const { syncBingo } = require("../utils/syncBingo");
-const bingoService = require("../services/bingoService");
 
 exports.updateInquiry = async (req, res) => {
   try {
@@ -148,7 +148,7 @@ exports.getBingoCount = async (req, res) => {
   try {
     const username = req.params.id;
     const userInfo = await User.findOne({ username });
-    const bingoCount = await bingoService.getBingoCount(userInfo._id);
+    const bingoCount = await getBingoCount(userInfo._id);
     res.status(200).json({ bingoCount });
   } catch (error) {
     console.error(error);
@@ -158,7 +158,7 @@ exports.getBingoPattern = async (req, res) => {
   try {
     const username = req.params.id;
     const userInfo = await User.findOne({ username });
-    const bingoPattern = await bingoService.getBingoPattern(userInfo._id);
+    const bingoPattern = await getBingoPattern(userInfo._id);
     console.log("보내기 직전", bingoPattern);
     res.status(200).json({ bingoPattern });
   } catch (error) {
@@ -176,7 +176,7 @@ exports.bingoStatusReset = async (req, res) => {
   try {
     const username = req.params.id;
     const userInfo = await User.findOne({ username });
-    const bingo = await bingoService.resetBingo(userInfo._id);
+    const bingo = await resetBingo(userInfo._id);
     res.status(200).json({ bingo });
   } catch (error) {
     console.error(error);
