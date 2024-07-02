@@ -8,15 +8,23 @@ const imageSchema = new Schema({
 
 const blogPostSchema = new Schema(
   {
-    nickname: {
+    author: {
       type: String,
       ref: "User",
     },
-    title: {
+    authorId: {
+      type: String,
+      ref: "User",
+    },
+    blogPostTitle: {
       type: String,
       require: true,
     },
-    desc: {
+    blogPostDesc: {
+      type: String,
+      require: true,
+    },
+    content: {
       type: String,
       required: true,
     },
@@ -26,6 +34,10 @@ const blogPostSchema = new Schema(
     },
     city: {
       type: String,
+    },
+    campSiteName: {
+      type: String,
+      required: true,
     },
 
     imageUrls: {
