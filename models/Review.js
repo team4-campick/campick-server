@@ -1,10 +1,23 @@
 const mongoose = require("mongoose");
 
 const reviewSchema = new mongoose.Schema({
+  author: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  score: {
+    type: Number,
+    required: true,
+  },
   review: {
-    type: Array,
+    type: String,
     required: true,
     maxlength: 200,
+  },
+  contentId: {
+    type: Number,
+    required: true,
   },
 });
 reviewSchema.set("timestamps", true);
