@@ -10,10 +10,10 @@ const blogPostSchema = new Schema(
   {
     author: {
       type: String,
-      ref: "User",
+      require: true,
     },
     authorId: {
-      type: String,
+      type: Schema.Types.ObjectId,
       ref: "User",
     },
     blogPostTitle: {

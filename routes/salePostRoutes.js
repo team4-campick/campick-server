@@ -6,13 +6,12 @@ const {
   updateSalePost,
   deleteSalePost,
 } = require("../controller/salePostController.js");
-// const { checkAuth } = require("../middleware/checkAuth.js");
+const { checkAuth } = require("../middleware/checkAuth.js");
 const { fileUpload } = require("../utils/fileUpload.js");
 
 const router = Router();
 router.route("/").get(getSalePosts);
-// router.route("/").post(checkAuth, createSalePost);
-router.route("/").post(fileUpload.array("images"), createSalePost);
+router.route("/").post(checkAuth, fileUpload.array("images"), createSalePost);
 
 router
   .route("/:id")
