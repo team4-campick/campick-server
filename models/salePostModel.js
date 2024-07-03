@@ -8,14 +8,14 @@ const imageSchema = new Schema({
 
 const salePostSchema = new Schema(
   {
-    // author: {
-    //   type: String,
-    //   ref: "User",
-    // },
-    // authorId: {
-    //   type: String,
-    //   ref: "User",
-    // },
+    author: {
+      type: String,
+      ref: "User",
+    },
+    authorId: {
+      type: String,
+      ref: "User",
+    },
     category: {
       type: String,
       require: true,

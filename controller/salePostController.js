@@ -90,13 +90,15 @@ const createSalePost = async (req, res) => {
   //     .status(400)
   //     .json({ result: false, message: '필수항목을 입력해주세요.' });
   // }
-
+  const { nickname, _id } = req.user;
   try {
     const salePost = new SalePost({
       ...newPost,
       city: newPost.city ?? "-",
       imageUrls: [...imageUrls],
       salesStatus: "selling",
+      author: nickname,
+      authorId: _id,
     });
 
     await salePost.save();
