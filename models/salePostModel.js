@@ -8,11 +8,14 @@ const imageSchema = new Schema({
 
 const salePostSchema = new Schema(
   {
-    nickname: {
-      type: String,
-      // required: true,
-      ref: "User",
-    },
+    // author: {
+    //   type: String,
+    //   ref: "User",
+    // },
+    // authorId: {
+    //   type: String,
+    //   ref: "User",
+    // },
     category: {
       type: String,
       require: true,
