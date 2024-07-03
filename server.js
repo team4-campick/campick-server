@@ -9,6 +9,7 @@ const imageRoutes = require("./routes/imageRoutes");
 const salePostRoutes = require("./routes/salePostRoutes");
 const myPageRoute = require("./routes/myPageRoutes");
 const authRoutes = require("./routes/authRoutes");
+const blogPostRoutes = require("./routes/blogPostRoutes");
 
 const db = require("./db/connectDB");
 
@@ -36,6 +37,7 @@ app.use(
 
 app.use("/api", imageRoutes);
 app.use("/api/sale-posts", salePostRoutes);
+app.use("/api/blog-posts", blogPostRoutes);
 app.use("/", myPageRoute);
 app.use("/", authRoutes);
 
