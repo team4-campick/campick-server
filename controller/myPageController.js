@@ -25,7 +25,6 @@ exports.updateInquiry = async (req, res) => {
     // 어떤 사람이 작성한건지 구분하는 부분을 추가하면 좋을거 같은데 nickname 으로
     // 진행하면 닉네임 변경시 하나하나 다 반영해야하는 문제가 있음. 그부분을 어떻게 할까유..
     const inquiryDoc = await Inquiry.create({ title, email, content });
-    console.log("inquiryDoc", inquiryDoc);
     res.status(200).json(userDoc);
   } catch (error) {
     res.status(400).json({ error: "Invalid request" });
@@ -85,9 +84,7 @@ exports.passwordCheck = async (req, res) => {
   try {
     const username = req.params.id;
     const { password } = req.body;
-    console.log(username, password);
     const userDoc = await UserServices.passwordCheck(username, password);
-    console.log("userDoc222", userDoc);
     res.status(200).json({ success: true });
   } catch (error) {
     res.status(401).json({ success: false, message: error.message });
@@ -96,11 +93,9 @@ exports.passwordCheck = async (req, res) => {
 exports.updateMission = async (req, res) => {
   try {
     const username = req.params.id;
-    // const mission = req.body;
     const userInfo = await User.findOne({ username });
     // userInfo 찾은 부분도 service 단으로 옮겨야할듯.
     const postCount = await getPostCount(userInfo._id);
-    const reviewCount = await getReviewCount(userInfo._id);
     const missionClear = await getMissionClear(userInfo._id);
     const bingoCount = await getBingoCount(userInfo._id);
     const continuousConnection = await getContinuousConnection(userInfo._id);
@@ -116,15 +111,13 @@ exports.updateMission = async (req, res) => {
 
     const newMission = {
       postCount,
-      reviewCount,
+      // reviewCount,
       missionClear,
       bingoCount,
       continuousConnection,
     };
     const checkedMission = bingoMission(newMission);
-    // const update = await updateBingoMission(userInfo._id, checkedMission);
-    console.log(checkedMission);
-    console.log("@@@@@@@@@@@@@@@@@@@@@@@@", newMission);
+
     const bingo = await Bingo.findById(userInfo._id);
     const mission = await updateMissionList(userInfo._id, newMission);
     const updatedBingo = await syncBingo(bingo, checkedMission);
@@ -159,7 +152,6 @@ exports.getBingoPattern = async (req, res) => {
     const username = req.params.id;
     const userInfo = await User.findOne({ username });
     const bingoPattern = await getBingoPattern(userInfo._id);
-    console.log("보내기 직전", bingoPattern);
     res.status(200).json({ bingoPattern });
   } catch (error) {
     console.error(error);
