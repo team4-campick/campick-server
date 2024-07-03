@@ -17,4 +17,7 @@ router.get("/bingo-pattern/:id", myPageController.getBingoPattern);
 router.post("/update-mission/:id", myPageController.updateMission);
 router.post("/reset-bingo/:id", myPageController.bingoStatusReset);
 
+// router.get("/post/:id", myPageController.getPost);
+// post 스키마 업데이트 되면 적용 예정
+
 module.exports = router;

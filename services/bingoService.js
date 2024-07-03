@@ -21,32 +21,26 @@ class BingoService {
   //   const updatedMission = await Mission.findOneAndUpdate({ _id }, { mission });
   //   return updatedMission;
   // }
-  async getReviewCount(_id) {
+  async getReviewCount(id) {
     // 리뷰 카운트 업데이트 -> 이렇게 하면 리셋 했을때 문제 해결!
     // const mission = await Mission.findById(_id);
     // const count = mission.reviewCount.length;
     // return count;
-    const review = (await Review.findById(_id))
-      ? await Review.findById(_id)
-      : null;
-    console.log("리뷰 카운터", _id); //
-    console.log("리뷰 카운터 리뷰 리스트", review);
-    if (review) {
-      const reviewCount = review.review ? review.review.length : 0;
-      console.log("리뷰 갯수", reviewCount);
-      return reviewCount;
-    } else {
-      return 0;
-    }
+    const review = await Mission.findById(id);
+    const count = review ? review.reviewCount : 0;
+    console.log("리뷰 갯수", count);
+    return count;
   }
   async getPostCount(_id) {
     // 리뷰 카운트 업데이트 -> 이렇게 하면 리셋 했을때 문제 해결!
     // const mission = await Mission.findById(_id);
     // const count = mission.postCount.length;
     // return count;
-    const post = (await Post.findById(_id)) ? await Post.findById(_id) : null;
-    const postCount = post ? post.length : 0;
-    return postCount;
+    const post = (await Mission.findById(_id))
+      ? await Mission.findById(_id)
+      : null;
+    const count = post ? post.postCount : 0;
+    return count;
   }
   async getMissionClear(_id) {
     const bingo = await Bingo.findById(_id);

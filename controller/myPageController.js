@@ -16,6 +16,7 @@ const {
 } = require("../services/bingoService");
 const { bingoMission } = require("../utils/bingoMission");
 const { syncBingo } = require("../utils/syncBingo");
+const Post = require("../models/Post");
 
 exports.updateInquiry = async (req, res) => {
   try {
@@ -25,7 +26,7 @@ exports.updateInquiry = async (req, res) => {
     // 어떤 사람이 작성한건지 구분하는 부분을 추가하면 좋을거 같은데 nickname 으로
     // 진행하면 닉네임 변경시 하나하나 다 반영해야하는 문제가 있음. 그부분을 어떻게 할까유..
     const inquiryDoc = await Inquiry.create({ title, email, content });
-    res.status(200).json(userDoc);
+    res.status(200).json(inquiryDoc);
   } catch (error) {
     res.status(400).json({ error: "Invalid request" });
   }
@@ -96,6 +97,7 @@ exports.updateMission = async (req, res) => {
     const userInfo = await User.findOne({ username });
     // userInfo 찾은 부분도 service 단으로 옮겨야할듯.
     const postCount = await getPostCount(userInfo._id);
+    const reviewCount = await getReviewCount(userInfo._id);
     const missionClear = await getMissionClear(userInfo._id);
     const bingoCount = await getBingoCount(userInfo._id);
     const continuousConnection = await getContinuousConnection(userInfo._id);
@@ -111,7 +113,7 @@ exports.updateMission = async (req, res) => {
 
     const newMission = {
       postCount,
-      // reviewCount,
+      reviewCount,
       missionClear,
       bingoCount,
       continuousConnection,
@@ -170,6 +172,17 @@ exports.bingoStatusReset = async (req, res) => {
     const userInfo = await User.findOne({ username });
     const bingo = await resetBingo(userInfo._id);
     res.status(200).json({ bingo });
+  } catch (error) {
+    console.error(error);
+  }
+};
+exports.getPost = async (req, res) => {
+  try {
+    const username = req.params.id;
+    const userInfo = await User.findOne({ username });
+    const post = await Post.find({ _id: userInfo._id });
+    console.log("post list get test", post);
+    res.status(200).json({ post });
   } catch (error) {
     console.error(error);
   }
