@@ -41,12 +41,10 @@ const register = async (req, res) => {
 
     // 사용자 이름 형식 검사
     if (!/^[a-zA-Z][a-zA-Z0-9]{3,}$/.test(username)) {
-      return res
-        .status(400)
-        .json({
-          message:
-            "Username must be at least 4 characters long and start with a letter",
-        });
+      return res.status(400).json({
+        message:
+          "Username must be at least 4 characters long and start with a letter",
+      });
     }
 
     const hashedPassword = encrypt(password);
@@ -103,9 +101,13 @@ const login = async (req, res) => {
       return res.status(401).json({ message: "failed" });
     }
 
-    const token = jwt.sign({ username, id: user._id }, "your_jwt_secret", {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign(
+      { username, id: user._id, nickname: user.nickname },
+      "your_jwt_secret",
+      {
+        expiresIn: "1h",
+      }
+    );
 
     await User.findByIdAndUpdate(user._id, { $push: { loginDate } });
 
@@ -118,6 +120,7 @@ const login = async (req, res) => {
       .json({
         id: user._id,
         username,
+        nickname: user.nickname,
       });
   } catch (error) {
     console.error("Error logging in:", error);
