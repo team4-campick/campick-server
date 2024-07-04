@@ -4,16 +4,19 @@ const User = require("../models/User");
 const checkAuth = async (req, res, next) => {
   try {
     const { token } = req.cookies;
-    console.log(req.cookies);
 
     if (!token) {
-      return res.status(401).json({ error: "로그인이 필요합니다" });
+      return res
+        .status(401)
+        .json({ result: false, message: "로그인이 필요합니다" });
     }
 
     const decoded = jwt.verify(token, "your_jwt_secret");
 
     if (!decoded) {
-      return res.status(401).json({ error: "토큰이 유효하지 않습니다." });
+      return res
+        .status(401)
+        .json({ result: false, message: "토큰이 유효하지 않습니다." });
     }
 
     const user = await User.findById(decoded.id);
@@ -21,7 +24,7 @@ const checkAuth = async (req, res, next) => {
     if (!user) {
       return res
         .status(404)
-        .json({ error: "존재하지 않는 유저 아이디입니다." });
+        .json({ result: false, message: "존재하지 않는 유저 아이디입니다." });
     }
 
     // {username, id}

@@ -16,7 +16,6 @@ const messageSchema = new Schema(
       type: String,
       required: true,
     },
-    // createdAt, updatedAt
   },
   { timestamps: true }
 );
