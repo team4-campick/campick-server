@@ -11,10 +11,12 @@ const myPageRoute = require("./routes/myPageRoutes");
 const authRoutes = require("./routes/authRoutes");
 const campsiteRoutes = require("./routes/campsiteRoutes");
 const blogPostRoutes = require("./routes/blogPostRoutes");
+const messageRoutes = require("./routes/messageRoutes");
+
+const { app, server } = require("./utils/socket");
 
 const db = require("./db/connectDB");
 
-const app = express();
 require("dotenv").config();
 
 const port = process.env.PORT_NUM || 8000;
@@ -39,6 +41,7 @@ app.use(
 app.use("/api", imageRoutes);
 app.use("/api/sale-posts", salePostRoutes);
 app.use("/api/blog-posts", blogPostRoutes);
+app.use("/api/messages", messageRoutes);
 app.use("/", myPageRoute);
 app.use("/", authRoutes);
 app.use("/", campsiteRoutes);
@@ -47,4 +50,4 @@ db.connectDB();
 
 app.get("/", async (req, res) => res.json("Hello World!"));
 
-app.listen(port, () => console.log(`${port}번에서 돌아감`));
+server.listen(port, () => console.log(`${port}번에서 돌아감`));

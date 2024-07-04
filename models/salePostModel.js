@@ -13,7 +13,7 @@ const salePostSchema = new Schema(
       ref: "User",
     },
     authorId: {
-      type: String,
+      type: Schema.Types.ObjectId,
       ref: "User",
     },
     category: {
@@ -52,7 +52,7 @@ const salePostSchema = new Schema(
     },
     salesStatus: {
       type: String,
-      enum: ["selling", "sold", "reserved"],
+      enum: ["판매중", "예약중", "거래완료"],
       default: "selling",
     },
   },
