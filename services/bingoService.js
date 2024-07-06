@@ -1,7 +1,5 @@
 const User = require("../models/User");
 const Mission = require("../models/Mission");
-const Review = require("../models/Review");
-const Post = require("../models/Post");
 const Bingo = require("../models/Bingo");
 
 const { shuffle } = require("../utils/shuffle");
@@ -10,6 +8,7 @@ const { missionClearCounter } = require("../utils/missionClearCounter");
 const { consecutiveVisitDays } = require("../utils/consecutiveVisitDays");
 
 const { BINGO_AREA } = require("../constants/bingoArea");
+const Coupon = require("../models/Coupon");
 
 class BingoService {
   // async getMissionStatus(_id) {
@@ -63,7 +62,6 @@ class BingoService {
   async getBingoPattern(_id) {
     const getBingo = await Bingo.findById(_id);
     const pattern = bingoRule(getBingo.bingo).bingoPattern;
-    console.log("bingo pattern", pattern);
     return pattern;
   }
   // async updateBingoMission(_id, newMission) {
@@ -77,15 +75,6 @@ class BingoService {
   //   return updatedMission;
   // }
   async updateMissionList(_id, newMission) {
-    console.log("newMissionList test===========", newMission);
-    console.log(newMission.postCount);
-    console.log("newMissionList test===========", newMission.reviewCount);
-    console.log("newMissionList test===========", newMission.missionClear);
-    console.log("newMissionList test===========", newMission.bingoCount);
-    console.log(
-      "newMissionList test===========",
-      newMission.continuousConnection
-    );
     const updatedMission = await Mission.findByIdAndUpdate(
       _id,
       {
@@ -100,6 +89,7 @@ class BingoService {
     return updatedMission;
   }
   async resetMission(_id) {
+    await User.findByIdAndUpdate({ _id }, { loginDate: [] });
     const resetMission = await Mission.findByIdAndUpdate(_id, {
       postCount: 0,
       reviewCount: 0,

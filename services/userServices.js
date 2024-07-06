@@ -4,6 +4,7 @@ const Post = require("../models/Post");
 const Review = require("../models/Review");
 const User = require("../models/User");
 const hash = require("../utils/encrypt");
+const bcrypt = require("bcryptjs");
 
 class UserService {
   async getUserData(username) {
@@ -36,16 +37,12 @@ class UserService {
     );
     return user;
   }
-  async passwordCheck(username, nickname, password) {
-    console.log(
-      "func username",
-      typeof nickname,
-      "func password",
-      typeof password
-    );
+  async passwordCheck(username, password) {
     const user = await User.findOne({ username });
-    const validPassword = await bcrypt.compare(password, user.password);
-    console.log("user.password : ", user.password);
+    console.log("user.password", user.password);
+    console.log("password", password);
+    const validPassword = bcrypt.compareSync(password, user.password);
+    console.log("validPassword : ", validPassword);
     if (validPassword) {
       return true;
     } else {

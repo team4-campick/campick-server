@@ -1,8 +1,10 @@
 const Inquiry = require("../models/Inquiry");
-// const Post = require('../models/Post');
 const User = require("../models/User");
-// const Review = require('../models/Review');
 const Bingo = require("../models/Bingo");
+const Post = require("../models/Post");
+const Coupon = require("../models/Coupon");
+// const cron = require("node-cron");
+
 const UserServices = require("../services/userServices");
 const {
   getPostCount,
@@ -16,15 +18,10 @@ const {
 } = require("../services/bingoService");
 const { bingoMission } = require("../utils/bingoMission");
 const { syncBingo } = require("../utils/syncBingo");
-const Post = require("../models/Post");
 
 exports.updateInquiry = async (req, res) => {
   try {
-    // const username = req.params.id;
     const { title, email, content } = req.body;
-    // const user = await User.findOne({username });
-    // 어떤 사람이 작성한건지 구분하는 부분을 추가하면 좋을거 같은데 nickname 으로
-    // 진행하면 닉네임 변경시 하나하나 다 반영해야하는 문제가 있음. 그부분을 어떻게 할까유..
     const inquiryDoc = await Inquiry.create({ title, email, content });
     res.status(200).json(inquiryDoc);
   } catch (error) {
@@ -36,6 +33,7 @@ exports.updateUser = async (req, res) => {
     const username = req.params.id;
     const { nickname, password } = req.body;
     console.log("test", username);
+    console.log("nickname", nickname);
     console.log(nickname, password);
     const userDoc = await UserServices.updateUserData(
       username,
@@ -84,8 +82,9 @@ exports.duplicateCheck = async (req, res) => {
 exports.passwordCheck = async (req, res) => {
   try {
     const username = req.params.id;
+    console.log("username test", username);
     const { password } = req.body;
-    const userDoc = await UserServices.passwordCheck(username, password);
+    await UserServices.passwordCheck(username, password);
     res.status(200).json({ success: true });
   } catch (error) {
     res.status(401).json({ success: false, message: error.message });
@@ -96,20 +95,11 @@ exports.updateMission = async (req, res) => {
     const username = req.params.id;
     const userInfo = await User.findOne({ username });
     // userInfo 찾은 부분도 service 단으로 옮겨야할듯.
-    const postCount = await getPostCount(userInfo._id);
-    const reviewCount = await getReviewCount(userInfo._id);
-    const missionClear = await getMissionClear(userInfo._id);
-    const bingoCount = await getBingoCount(userInfo._id);
-    const continuousConnection = await getContinuousConnection(userInfo._id);
-
-    // 아래부분은 빙고 패턴 테스트를 위한 테스트 데이터임.
-    // const postCount = 6;
-    // const reviewCount = 10;
-    // const missionClear = await getMissionClear(userInfo._id);
-    // const bingoCount = await getBingoCount(userInfo._id);
-    // const continuousConnection = 7;
-    // const findValue = await Mission.findOne({ _id: userInfo._id });
-    // const continuousConnection = findValue.mission.continuousConnection;
+    const postCount = await getPostCount(userInfo?._id);
+    const reviewCount = await getReviewCount(userInfo?._id);
+    const missionClear = await getMissionClear(userInfo?._id);
+    const bingoCount = await getBingoCount(userInfo?._id);
+    const continuousConnection = await getContinuousConnection(userInfo?._id);
 
     const newMission = {
       postCount,
@@ -187,3 +177,82 @@ exports.getPost = async (req, res) => {
     console.error(error);
   }
 };
+
+// ================ 쿠폰 관련 API ====================
+exports.getCouponList = async (req, res) => {
+  try {
+    const username = req.params.id;
+    const userInfo = await User.findOne({ username });
+    const couponList = await Coupon.populate("owner").findById({
+      _id: userInfo._id,
+    });
+    console.log(couponList);
+    res.status(200).json({ couponList });
+  } catch (error) {
+    console.error(error);
+  }
+};
+exports.issuanceCoupon = async (req, res) => {
+  try {
+    const username = req.params.id;
+    const { date, type } = req.body;
+    const serialNum = Math.floor(
+      100000000000 + Math.random() * 900000000000
+    ).toString();
+    const userInfo = await User.findOne({ username });
+    const coupon = await Coupon.create({
+      owner: userInfo._id,
+      date,
+      type,
+      serialNum,
+      status: "inactive",
+      activeDate: null,
+    });
+    console.log("coupon create test", coupon);
+    res.status(201).json({ message: "새로운 쿠폰 발급 완료" });
+  } catch (error) {
+    console.error(error);
+  }
+};
+exports.activateCoupon = async (req, res) => {
+  try {
+    const couponId = req.params.id;
+    const updatedCoupon = await Coupon.findByIdAndUpdate(
+      couponId,
+      {
+        status: "active",
+        activeDate: new Date(),
+      },
+      { new: true }
+    );
+    if (updatedCoupon) {
+      console.log("Coupon activated:", updatedCoupon);
+    } else {
+      console.log("Coupon not found");
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+// async function checkAndExpireCoupons() {
+//   try {
+//     const now = new Date();
+//     const activeCoupons = await Coupon.find({ status: "active" });
+//     for (let coupon of activeCoupons) {
+//       const expirationDate = new Date(coupon.activeDate);
+//       expirationDate.setDate(expirationDate.getDate() + coupon.date);
+//       if (now > expirationDate) {
+//         coupon.status = "expired";
+//         await coupon.save();
+//         console.log(`Coupon ${coupon.serialNum} has expired.`);
+//       }
+//     }
+//   } catch (error) {
+//     console.error("Error checking and expiring coupons:", error);
+//   }
+// }
+// cron.schedule("0 0 * * *", () => {
+//   console.log("Running daily coupon expiration check");
+//   checkAndExpireCoupons();
+// });
