@@ -1,6 +1,9 @@
 const { Schema, model } = require("mongoose");
 
 const imageSchema = new Schema({
+  publicId: {
+    type: String,
+  },
   url: {
     type: String,
   },
@@ -39,8 +42,10 @@ const blogPostSchema = new Schema(
       type: String,
       required: true,
     },
-
     imageUrls: {
+      type: [imageSchema],
+    },
+    backgroundImgUrls: {
       type: [imageSchema],
     },
   },

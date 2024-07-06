@@ -1,10 +1,10 @@
 const fs = require("fs");
 const SalePost = require("../models/salePostModel.js");
 const { cloudinaryUpload } = require("../utils/fileUpload.js");
+const { deleteUploadedImages } = require("../utils/deleteUploadedImages.js");
 
 const getSalePosts = async (req, res) => {
   const { category, keyword } = req.query;
-  console.log(keyword);
 
   if (category) {
     try {
@@ -78,25 +78,20 @@ const createSalePost = async (req, res) => {
   const imageUrls = [];
   for (const file of req.files) {
     const imageUrl = await cloudinaryUpload(file);
-    imageUrls.push({ url: imageUrl });
+    imageUrls.push(imageUrl);
     // uploads/images 폴더에 임시로 저장된 이미지 파일 삭제
     fs.unlinkSync(file.path);
   }
 
   const newPost = JSON.parse(req.body.newPost);
 
-  // if (!category || !region || !city || !price || !desc || !productName) {
-  //   return res
-  //     .status(400)
-  //     .json({ result: false, message: '필수항목을 입력해주세요.' });
-  // }
   const { nickname, _id } = req.user;
   try {
     const salePost = new SalePost({
       ...newPost,
-      city: newPost.city ?? "-",
+      city: newPost.city ?? " ",
       imageUrls: [...imageUrls],
-      salesStatus: "selling",
+      salesStatus: "판매중",
       author: nickname,
       authorId: _id,
     });
@@ -163,7 +158,9 @@ const deleteSalePost = async (req, res) => {
         .status(404)
         .json({ result: false, message: "게시물이 존재하지 않습니다." });
     }
-
+    // 업로드된 이미지 파일 cloudinary에서 삭제
+    const { imageUrls } = salePost;
+    deleteUploadedImages(imageUrls);
     await SalePost.deleteOne({ _id: id });
 
     return res
