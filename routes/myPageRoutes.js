@@ -14,6 +14,7 @@ router.post("/editInfo/:id", myPageController.updateUser);
 router.get("/bingo-area/:id", myPageController.getBingo);
 router.get("/bingo-count/:id", myPageController.getBingoCount);
 router.get("/bingo-pattern/:id", myPageController.getBingoPattern);
+router.get("/post/:id", myPageController.getPost);
 router.post("/update-mission/:id", myPageController.updateMission);
 router.post("/reset-bingo/:id", myPageController.bingoStatusReset);
 

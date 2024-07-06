@@ -1,8 +1,9 @@
 const Inquiry = require("../models/Inquiry");
 const User = require("../models/User");
 const Bingo = require("../models/Bingo");
-const Post = require("../models/Post");
 const Coupon = require("../models/Coupon");
+const BlogPost = require("../models/blogPostModel");
+const SalePost = require("../models/salePostModel");
 // const cron = require("node-cron");
 
 const UserServices = require("../services/userServices");
@@ -170,7 +171,8 @@ exports.getPost = async (req, res) => {
   try {
     const username = req.params.id;
     const userInfo = await User.findOne({ username });
-    const post = await Post.find({ _id: userInfo._id });
+    console.log("testtest", userInfo._id);
+    const post = await BlogPost.find({ authorId: userInfo._id });
     console.log("post list get test", post);
     res.status(200).json({ post });
   } catch (error) {
