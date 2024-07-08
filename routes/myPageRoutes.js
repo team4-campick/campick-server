@@ -17,8 +17,10 @@ router.get("/bingo-pattern/:id", myPageController.getBingoPattern);
 router.get("/post/:id", myPageController.getPost);
 router.post("/update-mission/:id", myPageController.updateMission);
 router.post("/reset-bingo/:id", myPageController.bingoStatusReset);
+router.post("/check-duplicate/:id", myPageController.checkCoupon);
+router.post("/issue-coupon/:id", myPageController.issuanceCoupon);
+router.get("/get-coupon/:id", myPageController.getCouponList);
 
-// router.get("/post/:id", myPageController.getPost);
-// post 스키마 업데이트 되면 적용 예정
+router.get("/sale-post/:id", myPageController.getSalePost);
 
 module.exports = router;

@@ -9,6 +9,7 @@ exports.consecutiveVisitDays = (dateArr) => {
     (date) => new Date(date).getTime() / (1000 * 60 * 60 * 24)
   );
   convertedDateArray.sort((a, b) => a - b);
+  console.log("convertedDateArray", convertedDateArray);
   let count = 1;
   for (let i = 0; i < convertedDateArray.length - 1; i++) {
     const diff = convertedDateArray[i + 1] - convertedDateArray[i];
