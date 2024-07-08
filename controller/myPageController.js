@@ -4,7 +4,7 @@ const Bingo = require("../models/Bingo");
 const Coupon = require("../models/Coupon");
 const BlogPost = require("../models/blogPostModel");
 const SalePost = require("../models/salePostModel");
-// const cron = require("node-cron");
+const cron = require("node-cron");
 
 const UserServices = require("../services/userServices");
 const {
