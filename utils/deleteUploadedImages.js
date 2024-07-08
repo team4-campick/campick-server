@@ -7,7 +7,7 @@ const deleteUploadedImages = async (imageUrls) => {
     await cloudinary.api.delete_resources(publicIds, function (error, result) {
       console.log("cloudinary delete resources console", result, error);
     });
-  } catch {
+  } catch (error) {
     console.log(error);
   }
 };
