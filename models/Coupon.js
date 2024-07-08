@@ -10,6 +10,11 @@ const couponSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  // condition -> ex) 1 bingo Coupon
+  condition: {
+    type: String,
+    required: true,
+  },
   type: {
     type: String,
     required: true,
@@ -26,6 +31,10 @@ const couponSchema = new mongoose.Schema({
     default: "inactive",
   },
   activeDate: {
+    type: Date,
+    default: null,
+  },
+  expireDate: {
     type: Date,
     default: null,
   },

@@ -30,37 +30,31 @@ class BingoService {
     console.log("리뷰 갯수", count);
     return count;
   }
-  async getPostCount(_id) {
-    // 리뷰 카운트 업데이트 -> 이렇게 하면 리셋 했을때 문제 해결!
-    // const mission = await Mission.findById(_id);
-    // const count = mission.postCount.length;
-    // return count;
-    const post = (await Mission.findById(_id))
-      ? await Mission.findById(_id)
+  async getPostCount(id) {
+    const post = (await Mission.findById(id))
+      ? await Mission.findById(id)
       : null;
     const count = post ? post.postCount : 0;
     return count;
   }
-  async getMissionClear(_id) {
-    const bingo = await Bingo.findById(_id);
-    console.log("과연?", bingo);
+  async getMissionClear(id) {
+    const bingo = await Bingo.findById(id);
     const count = missionClearCounter(bingo.bingo);
-    console.log("클리어한 미션 :", count);
     return count;
   }
-  async getBingoCount(_id) {
-    const getBingo = await Bingo.findById(_id);
+  async getBingoCount(id) {
+    const getBingo = await Bingo.findById(id);
     const count = bingoRule(getBingo.bingo).count;
     return count;
   }
-  async getContinuousConnection(_id) {
-    const user = await User.findOne({ _id });
+  async getContinuousConnection(id) {
+    const user = await User.findById(id);
     const loginDate = user ? user.loginDate : null;
     const count = loginDate ? consecutiveVisitDays(loginDate) : 1;
     return count;
   }
-  async getBingoPattern(_id) {
-    const getBingo = await Bingo.findById(_id);
+  async getBingoPattern(id) {
+    const getBingo = await Bingo.findById(id);
     const pattern = bingoRule(getBingo.bingo).bingoPattern;
     return pattern;
   }

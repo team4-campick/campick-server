@@ -1,8 +1,9 @@
 const Inquiry = require("../models/Inquiry");
 const User = require("../models/User");
 const Bingo = require("../models/Bingo");
-const Post = require("../models/Post");
 const Coupon = require("../models/Coupon");
+const BlogPost = require("../models/blogPostModel");
+const SalePost = require("../models/salePostModel");
 // const cron = require("node-cron");
 
 const UserServices = require("../services/userServices");
@@ -15,6 +16,8 @@ const {
   updateBingoMission,
   updateMissionList,
   getBingoPattern,
+  resetMission,
+  resetBingo,
 } = require("../services/bingoService");
 const { bingoMission } = require("../utils/bingoMission");
 const { syncBingo } = require("../utils/syncBingo");
@@ -92,14 +95,14 @@ exports.passwordCheck = async (req, res) => {
 };
 exports.updateMission = async (req, res) => {
   try {
-    const username = req.params.id;
-    const userInfo = await User.findOne({ username });
+    const userObjId = req.params.id;
+    // const userInfo = await User.findOne({ username });
     // userInfo 찾은 부분도 service 단으로 옮겨야할듯.
-    const postCount = await getPostCount(userInfo?._id);
-    const reviewCount = await getReviewCount(userInfo?._id);
-    const missionClear = await getMissionClear(userInfo?._id);
-    const bingoCount = await getBingoCount(userInfo?._id);
-    const continuousConnection = await getContinuousConnection(userInfo?._id);
+    const postCount = await getPostCount(userObjId);
+    const reviewCount = await getReviewCount(userObjId);
+    const missionClear = await getMissionClear(userObjId);
+    const bingoCount = await getBingoCount(userObjId);
+    const continuousConnection = await getContinuousConnection(userObjId);
 
     const newMission = {
       postCount,
@@ -110,10 +113,10 @@ exports.updateMission = async (req, res) => {
     };
     const checkedMission = bingoMission(newMission);
 
-    const bingo = await Bingo.findById(userInfo._id);
-    const mission = await updateMissionList(userInfo._id, newMission);
+    const bingo = await Bingo.findById(userObjId);
+    const mission = await updateMissionList(userObjId, newMission);
     const updatedBingo = await syncBingo(bingo, checkedMission);
-    await Bingo.findOneAndUpdate({ _id: userInfo._id }, { $set: updatedBingo });
+    await Bingo.findByIdAndUpdate(userObjId, { $set: updatedBingo });
     res.status(200).json({ mission, bingo: updatedBingo });
   } catch (error) {
     console.error(error);
@@ -121,9 +124,9 @@ exports.updateMission = async (req, res) => {
 };
 exports.getBingo = async (req, res) => {
   try {
-    const username = req.params.id;
-    const userInfo = await User.findOne({ username });
-    const bingo = await Bingo.findOne({ _id: userInfo._id });
+    const userObjId = req.params.id;
+    // const userInfo = await User.findOne({ username });
+    const bingo = await Bingo.findOne({ _id: userObjId });
     res.status(200).json({ bingo });
   } catch (error) {
     console.error(error);
@@ -131,9 +134,9 @@ exports.getBingo = async (req, res) => {
 };
 exports.getBingoCount = async (req, res) => {
   try {
-    const username = req.params.id;
-    const userInfo = await User.findOne({ username });
-    const bingoCount = await getBingoCount(userInfo._id);
+    const userObjId = req.params.id;
+    // const userInfo = await User.findOne({ username });
+    const bingoCount = await getBingoCount(userObjId);
     res.status(200).json({ bingoCount });
   } catch (error) {
     console.error(error);
@@ -141,26 +144,28 @@ exports.getBingoCount = async (req, res) => {
 };
 exports.getBingoPattern = async (req, res) => {
   try {
-    const username = req.params.id;
-    const userInfo = await User.findOne({ username });
-    const bingoPattern = await getBingoPattern(userInfo._id);
+    const userObjId = req.params.id;
+    // const userInfo = await User.findOne({ username });
+    const bingoPattern = await getBingoPattern(userObjId);
     res.status(200).json({ bingoPattern });
   } catch (error) {
     console.error(error);
   }
 };
-
+// Remove later.
 exports.bingoStatusUpdate = async (req, res) => {
   try {
   } catch (error) {
     console.error(error);
   }
 };
+
 exports.bingoStatusReset = async (req, res) => {
   try {
-    const username = req.params.id;
-    const userInfo = await User.findOne({ username });
-    const bingo = await resetBingo(userInfo._id);
+    const userObjId = req.params.id;
+    // const userInfo = await User.findOne({ username });
+    const bingo = await resetBingo(userObjId);
+    await resetMission(userInfo._id);
     res.status(200).json({ bingo });
   } catch (error) {
     console.error(error);
@@ -170,9 +175,22 @@ exports.getPost = async (req, res) => {
   try {
     const username = req.params.id;
     const userInfo = await User.findOne({ username });
-    const post = await Post.find({ _id: userInfo._id });
+    console.log("testtest", userInfo._id);
+    const post = await BlogPost.find({ authorId: userInfo._id });
     console.log("post list get test", post);
     res.status(200).json({ post });
+  } catch (error) {
+    console.error(error);
+  }
+};
+exports.getSalePost = async (req, res) => {
+  try {
+    console.log("start get sale post");
+    const authorId = req.params.id;
+    console.log("what", authorId);
+    const salePost = await SalePost.find({ authorId });
+    console.log("salePost", salePost);
+    res.status(200).json({ salePost });
   } catch (error) {
     console.error(error);
   }
@@ -181,34 +199,50 @@ exports.getPost = async (req, res) => {
 // ================ 쿠폰 관련 API ====================
 exports.getCouponList = async (req, res) => {
   try {
-    const username = req.params.id;
-    const userInfo = await User.findOne({ username });
-    const couponList = await Coupon.populate("owner").findById({
-      _id: userInfo._id,
-    });
-    console.log(couponList);
+    const ownerId = req.params.id;
+    const couponList = await Coupon.find({ owner: ownerId });
+    // const couponList = await Coupon.populate("owner").findById(userInfo._id);
+    console.log("couponList", couponList);
     res.status(200).json({ couponList });
+  } catch (error) {
+    console.error(error);
+  }
+};
+exports.checkCoupon = async (req, res) => {
+  try {
+    const ownerId = req.params.id;
+    const { coupon } = req.body;
+    const userCoupon = await Coupon.findOne({ owner: ownerId }).findOne({
+      condition: coupon.CONDITION,
+    });
+    console.log("userCoupon", userCoupon);
+    // const check = await userCoupon?;
+    if (!userCoupon) {
+      res.status(200).json({ message: "쿠폰이 없습니다." });
+    }
+    if (userCoupon) res.status(401).json({ message: "쿠폰이 있습니다." });
   } catch (error) {
     console.error(error);
   }
 };
 exports.issuanceCoupon = async (req, res) => {
   try {
-    const username = req.params.id;
-    const { date, type } = req.body;
+    const ownerId = req.params.id;
+    const { coupon } = req.body;
     const serialNum = Math.floor(
       100000000000 + Math.random() * 900000000000
     ).toString();
-    const userInfo = await User.findOne({ username });
-    const coupon = await Coupon.create({
-      owner: userInfo._id,
-      date,
-      type,
+    console.log("serialNum", serialNum);
+    const newCoupon = await Coupon.create({
+      owner: ownerId,
+      date: coupon.DATE,
+      condition: coupon.CONDITION,
+      type: coupon.TYPE,
       serialNum,
-      status: "inactive",
-      activeDate: null,
+      status: "active",
+      activeDate: new Date().toISOString(),
     });
-    console.log("coupon create test", coupon);
+    console.log("coupon create test", newCoupon);
     res.status(201).json({ message: "새로운 쿠폰 발급 완료" });
   } catch (error) {
     console.error(error);
@@ -235,24 +269,24 @@ exports.activateCoupon = async (req, res) => {
   }
 };
 
-// async function checkAndExpireCoupons() {
-//   try {
-//     const now = new Date();
-//     const activeCoupons = await Coupon.find({ status: "active" });
-//     for (let coupon of activeCoupons) {
-//       const expirationDate = new Date(coupon.activeDate);
-//       expirationDate.setDate(expirationDate.getDate() + coupon.date);
-//       if (now > expirationDate) {
-//         coupon.status = "expired";
-//         await coupon.save();
-//         console.log(`Coupon ${coupon.serialNum} has expired.`);
-//       }
-//     }
-//   } catch (error) {
-//     console.error("Error checking and expiring coupons:", error);
-//   }
-// }
-// cron.schedule("0 0 * * *", () => {
-//   console.log("Running daily coupon expiration check");
-//   checkAndExpireCoupons();
-// });
+async function checkAndExpireCoupons() {
+  try {
+    const now = new Date();
+    const activeCoupons = await Coupon.find({ status: "active" });
+    for (let coupon of activeCoupons) {
+      const expirationDate = new Date(coupon.activeDate);
+      expirationDate.setDate(expirationDate.getDate() + coupon.date);
+      if (now > expirationDate) {
+        coupon.status = "expired";
+        await coupon.save();
+        console.log(`Coupon ${coupon.serialNum} has expired.`);
+      }
+    }
+  } catch (error) {
+    console.error("Error checking and expiring coupons:", error);
+  }
+}
+cron.schedule("0 0 * * *", () => {
+  console.log("Running daily coupon expiration check");
+  checkAndExpireCoupons();
+});
