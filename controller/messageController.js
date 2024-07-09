@@ -7,12 +7,28 @@ const getConversations = async (req, res) => {
   try {
     const loggedInUserId = req.user._id;
 
-    // 왼쪽 채팅창에 보여주기 위해서 로그인한 유저(나)를 제외한 나머지 유저들의 정보를 반환
-    const filteredUsers = await User.find({
-      _id: { $ne: loggedInUserId },
-    }).select("-password");
+    const myConversations = await Conversation.find({
+      participants: loggedInUserId,
+    })
+      .populate({
+        path: "participants",
+        select: "-password", // password 필드를 제외
+      })
+      .sort({ updatedAt: -1 });
 
-    res.status(200).json({ result: true, filteredUsers });
+    const filteredChats = myConversations.map((chat) => {
+      chat.participants = chat.participants.filter(
+        (participant) => !participant._id.equals(loggedInUserId)
+      );
+      return chat;
+    });
+
+    // 왼쪽 채팅창에 보여주기 위해서 로그인한 유저(나)를 제외한 나머지 유저들의 정보를 반환
+    // const filteredUsers = await User.find({
+    //   _id: { $ne: loggedInUserId },
+    // }).select("-password");
+
+    res.status(200).json({ result: true, filteredChats });
   } catch (error) {
     console.error("Error in getUsersForSidebar: ", error.message);
     res.status(500).json({ error: "Internal server error" });
