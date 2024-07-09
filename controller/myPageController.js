@@ -214,13 +214,15 @@ exports.checkCoupon = async (req, res) => {
     const { coupon } = req.body;
     const userCoupon = await Coupon.findOne({ owner: ownerId }).findOne({
       condition: coupon.CONDITION,
+      status: "active",
     });
     console.log("userCoupon", userCoupon);
     // const check = await userCoupon?;
     if (!userCoupon) {
       res.status(200).json({ message: "쿠폰이 없습니다." });
     }
-    if (userCoupon) res.status(401).json({ message: "쿠폰이 있습니다." });
+    if (userCoupon && userCoupon.status === "active")
+      res.status(401).json({ message: "쿠폰이 있습니다." });
   } catch (error) {
     console.error(error);
   }
@@ -233,7 +235,13 @@ exports.issuanceCoupon = async (req, res) => {
       100000000000 + Math.random() * 900000000000
     ).toString();
     console.log("serialNum", serialNum);
-    const newCoupon = await Coupon.create({
+    const getDateNdays = async (nowDate, date) => {
+      const expirationDate = new Date(nowDate);
+      expirationDate.setDate(expirationDate.getDate() + date);
+      return new Date(expirationDate).toISOString();
+    };
+
+    await Coupon.create({
       owner: ownerId,
       date: coupon.DATE,
       condition: coupon.CONDITION,
@@ -241,34 +249,34 @@ exports.issuanceCoupon = async (req, res) => {
       serialNum,
       status: "active",
       activeDate: new Date().toISOString(),
+      expireDate: await getDateNdays(new Date(), coupon.DATE),
     });
-    console.log("coupon create test", newCoupon);
+
     res.status(201).json({ message: "새로운 쿠폰 발급 완료" });
   } catch (error) {
     console.error(error);
   }
 };
-exports.activateCoupon = async (req, res) => {
+exports.deleteCoupon = async (req, res) => {
   try {
-    const couponId = req.params.id;
-    const updatedCoupon = await Coupon.findByIdAndUpdate(
-      couponId,
-      {
-        status: "active",
-        activeDate: new Date(),
-      },
-      { new: true }
-    );
-    if (updatedCoupon) {
-      console.log("Coupon activated:", updatedCoupon);
-    } else {
-      console.log("Coupon not found");
-    }
+    console.log("delete coupon func");
+    const id = req.params.id;
+    console.log("id check", id);
+    await Coupon.findByIdAndDelete({ _id: id });
+    res.status(204).json({ message: "삭제 완료" });
   } catch (error) {
     console.error(error);
   }
 };
-
+exports.couponStatusChange = async (req, res) => {
+  try {
+    const couponId = req.params.id;
+    await Coupon.findByIdAndUpdate(couponId, { status: "expired" });
+    res.status(204).json({ message: "상태 변경 완료" });
+  } catch (error) {
+    console.error(error);
+  }
+};
 async function checkAndExpireCoupons() {
   try {
     const now = new Date();
