@@ -20,7 +20,8 @@ router.post("/reset-bingo/:id", myPageController.bingoStatusReset);
 router.post("/check-duplicate/:id", myPageController.checkCoupon);
 router.post("/issue-coupon/:id", myPageController.issuanceCoupon);
 router.get("/get-coupon/:id", myPageController.getCouponList);
-
+router.delete("/coupon/:id", myPageController.deleteCoupon);
+router.post("/coupon/:id", myPageController.couponStatusChange);
 router.get("/sale-post/:id", myPageController.getSalePost);
 
 module.exports = router;
