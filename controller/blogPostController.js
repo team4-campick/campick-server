@@ -25,7 +25,7 @@ const uploadImages = async (req, res) => {
 console.log(uploadImages);
 const getBlogPosts = async (req, res) => {
   try {
-    const blogPosts = await BlogPost.find();
+    const blogPosts = await BlogPost.find().sort({ createdAt: -1 });
     if (blogPosts.length === 0) {
       return res.status(200).json({ result: true, blogPosts: [] });
     }
@@ -112,7 +112,6 @@ const updateBlogPost = async (req, res) => {
     campSiteName,
     blogPostDesc,
     imageUrls,
-    backgroundImgUrls,
   } = req.body;
 
   try {
@@ -130,7 +129,6 @@ const updateBlogPost = async (req, res) => {
     blogPost.campSiteName = campSiteName;
     blogPost.blogPostDesc = blogPostDesc;
     blogPost.imageUrls = imageUrls;
-    blogPost.backgroundImgUrls = backgroundImgUrls;
 
     await blogPost.save();
     return res.status(200).json({ result: true, blogPost });
