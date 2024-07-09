@@ -42,7 +42,7 @@ const getSalePosts = async (req, res) => {
   }
 
   try {
-    const salePosts = await SalePost.find({});
+    const salePosts = await SalePost.find({}).sort({ createdAt: -1 });
     return res.status(200).json({ result: true, salePosts });
   } catch (error) {
     console.log(error);
