@@ -3,6 +3,34 @@ const Conversation = require("../models/conversationModel.js");
 const Message = require("../models/messageModel.js");
 const { getReceiverSocketId, io } = require("../utils/socket.js");
 
+const createConversation = async (req, res) => {
+  try {
+    const { receiverId } = req.body;
+    const senderId = req.user._id;
+
+    // 대화의 참여자로 보낸이와 받는이를 추가
+    let conversation = await Conversation.findOne({
+      participants: { $all: [senderId, receiverId] },
+    });
+
+    // 존재하는 대화가 없을 경우 새로운 대화 생성
+    if (!conversation) {
+      conversation = await Conversation.create({
+        participants: [senderId, receiverId],
+      });
+
+      await conversation.save();
+
+      return res.status(201).json({ result: true, conversation });
+    }
+
+    res.status(200).json({ result: true, conversation });
+  } catch (error) {
+    console.log("Error in createConversation controller: ", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 const getConversations = async (req, res) => {
   try {
     const loggedInUserId = req.user._id;
@@ -104,6 +132,7 @@ const getMessages = async (req, res) => {
 };
 
 module.exports = {
+  createConversation,
   getConversations,
   sendMessage,
   getMessages,
