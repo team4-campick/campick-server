@@ -8,7 +8,9 @@ const getSalePosts = async (req, res) => {
 
   if (category) {
     try {
-      const salePosts = await SalePost.find({ category });
+      const salePosts = await SalePost.find({ category }).sort({
+        createdAt: -1,
+      });
       if (salePosts.length === 0) {
         return res.status(200).json({ result: true, salePosts: [] });
       }
@@ -27,7 +29,9 @@ const getSalePosts = async (req, res) => {
 
     try {
       // 키워드가 포함된 데이터를 find
-      const salePosts = await SalePost.find({ productName: regex });
+      const salePosts = await SalePost.find({ productName: regex }).sort({
+        createdAt: -1,
+      });
       if (salePosts.length === 0) {
         return res.status(200).json({ result: true, salePosts: [] });
       }
@@ -118,6 +122,7 @@ const updateSalePost = async (req, res) => {
     desc,
     condition,
     isNegotiable,
+    salesStatus,
   } = req.body;
 
   try {
@@ -136,6 +141,7 @@ const updateSalePost = async (req, res) => {
     salePost.city = city;
     salePost.condition = condition;
     salePost.isNegotiable = isNegotiable;
+    salePost.salesStatus = salesStatus;
 
     await salePost.save();
     return res.status(200).json({ result: true, salePost });
