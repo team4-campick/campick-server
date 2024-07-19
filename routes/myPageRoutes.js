@@ -1,27 +1,58 @@
-const express = require("express");
-const router = express.Router();
-const myPageController = require("../controller/myPageController");
+const { Router } = require("express");
+const router = Router();
 
-router.get("/get-user/:id", myPageController.getUser);
+const {
+  // getUser,
+  updateInquiry,
+  deleteUserInfo,
+  duplicateCheck,
+  pwCheck,
+  updateUser,
+  getBingo,
+  getBingoCountFunc,
+  getBingoPatternStatus,
+  getPost,
+  updateMission,
+  bingoStatusReset,
+  checkCoupon,
+  issuanceCoupon,
+  getCouponList,
+  deleteCoupon,
+  couponStatusChange,
+  getSalePost,
+} = require("../controller/myPageController");
 
-router.post("/inquiry", myPageController.updateInquiry);
-router.delete("/delete-user/:id", myPageController.deleteUser);
+// router.get("/get-user/:id", getUser);
 
-router.post("/duplicateCheck", myPageController.duplicateCheck);
-router.post("/passwordCheck/:id", myPageController.passwordCheck);
-router.post("/editInfo/:id", myPageController.updateUser);
+router.post("/inquiry", updateInquiry);
 
-router.get("/bingo-area/:id", myPageController.getBingo);
-router.get("/bingo-count/:id", myPageController.getBingoCount);
-router.get("/bingo-pattern/:id", myPageController.getBingoPattern);
-router.get("/post/:id", myPageController.getPost);
-router.post("/update-mission/:id", myPageController.updateMission);
-router.post("/reset-bingo/:id", myPageController.bingoStatusReset);
-router.post("/check-duplicate/:id", myPageController.checkCoupon);
-router.post("/issue-coupon/:id", myPageController.issuanceCoupon);
-router.get("/get-coupon/:id", myPageController.getCouponList);
-router.delete("/coupon/:id", myPageController.deleteCoupon);
-router.post("/coupon/:id", myPageController.couponStatusChange);
-router.get("/sale-post/:id", myPageController.getSalePost);
+router.route("/user/:id").put(updateUser).delete(deleteUserInfo);
+// router.delete("/user/:id", deleteUser);
+// router.post("/user/:id", updateUser);
+
+router.post("/duplicateCheck", duplicateCheck);
+router.post("/passwordCheck/:id", pwCheck);
+
+router.get("/bingo-area/:id", getBingo);
+router.get("/bingo-count/:id", getBingoCountFunc);
+router.get("/bingo-pattern/:id", getBingoPatternStatus);
+router.get("/post/:id", getPost);
+router.post("/update-mission/:id", updateMission);
+router.post("/reset-bingo/:id", bingoStatusReset);
+router.post("/check-duplicate/:id", checkCoupon);
+
+// router.get("/coupon/:id", getCouponList);
+
+router
+  .route("/coupon/:id")
+  .get(getCouponList)
+  .post(issuanceCoupon)
+  .put(couponStatusChange)
+  .delete(deleteCoupon);
+// router.delete("/coupon/:id", deleteCoupon);
+// router.post("/coupon/:id", couponStatusChange);
+// router.post("/issue-coupon/:id", issuanceCoupon);
+
+router.get("/sale-post/:id", getSalePost);
 
 module.exports = router;

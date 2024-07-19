@@ -1,12 +1,19 @@
-const express = require("express");
-const router = express.Router();
+const { Router } = require("express");
+const router = Router();
 
-const campsiteController = require("../controller/campsiteController");
+const {
+  getReviews,
+  createReview,
+  deleteReview,
+  editReview,
+} = require("../controller/campsiteController");
 
-router.get("/get-reviews/:id", campsiteController.getReviews);
-router.post("/create-review/:id", campsiteController.createReview);
-router.get("/user/:id", campsiteController.getUser);
-router.delete("/delete/:id", campsiteController.deleteReview);
-router.post("/edit-review/:id", campsiteController.editReview);
+router.get("/review/:id", getReviews);
+router.post("/create-review/:id", createReview);
+router
+  .route("/review/:id")
+  .get(getReviews)
+  .post(editReview)
+  .delete(deleteReview);
 
 module.exports = router;
