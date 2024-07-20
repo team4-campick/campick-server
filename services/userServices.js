@@ -7,10 +7,6 @@ const hash = require("../utils/encrypt");
 const bcrypt = require("bcryptjs");
 
 class UserService {
-  async getUserData(username) {
-    const user = await User.findOne({ username });
-    return user;
-  }
   async deleteUser(username) {
     console.log("userId :", username);
     const user = await User.findOneAndDelete({ username });
@@ -33,7 +29,8 @@ class UserService {
     const hashedPassword = hash.encrypt(password);
     const user = await User.findOneAndUpdate(
       { username },
-      { nickname, password: hashedPassword }
+      { nickname, password: hashedPassword },
+      { new: true }
     );
     return user;
   }

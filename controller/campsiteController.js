@@ -2,7 +2,7 @@ const Review = require("../models/Review");
 const User = require("../models/User");
 const Mission = require("../models/Mission");
 
-exports.getReviews = async (req, res) => {
+const getReviews = async (req, res) => {
   try {
     const contentId = req.params.id;
     const reviews = await Review.find({ contentId }).populate("author");
@@ -11,7 +11,7 @@ exports.getReviews = async (req, res) => {
     console.error(error);
   }
 };
-exports.createReview = async (req, res) => {
+const createReview = async (req, res) => {
   try {
     const username = req.params.id;
     // 여기서 username은 현재 로그인된 유저의 id이다.
@@ -39,16 +39,7 @@ exports.createReview = async (req, res) => {
     res.status(403).send("Error");
   }
 };
-exports.getUser = async (req, res) => {
-  try {
-    const username = req.params.id;
-    const user = await User.findOne({ username });
-    res.json(user);
-  } catch (error) {
-    console.error("Error");
-  }
-};
-exports.deleteReview = async (req, res) => {
+const deleteReview = async (req, res) => {
   try {
     const reviewId = req.params.id;
     const review = await Review.findByIdAndDelete({ _id: reviewId });
@@ -57,7 +48,7 @@ exports.deleteReview = async (req, res) => {
     console.error(error);
   }
 };
-exports.editReview = async (req, res) => {
+const editReview = async (req, res) => {
   try {
     const _id = req.params.id;
     const { score, review, contentId } = req.body;
@@ -69,4 +60,10 @@ exports.editReview = async (req, res) => {
   } catch (error) {
     res.status(403).send("Error");
   }
+};
+module.exports = {
+  getReviews,
+  createReview,
+  deleteReview,
+  editReview,
 };

@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const Mission = require("../models/Mission");
 const Bingo = require("../models/Bingo");
+const Coupon = require("../models/Coupon");
 
 const { shuffle } = require("../utils/shuffle");
 const { bingoRule } = require("../utils/bingoRule");
@@ -8,7 +9,6 @@ const { missionClearCounter } = require("../utils/missionClearCounter");
 const { consecutiveVisitDays } = require("../utils/consecutiveVisitDays");
 
 const { BINGO_AREA } = require("../constants/bingoArea");
-const Coupon = require("../models/Coupon");
 
 class BingoService {
   // async getMissionStatus(_id) {

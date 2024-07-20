@@ -6,23 +6,29 @@ const BlogPost = require("../models/blogPostModel");
 const SalePost = require("../models/salePostModel");
 const cron = require("node-cron");
 
-const UserServices = require("../services/userServices");
+const {
+  updateUserData,
+  deleteUser,
+  duplicateNickname,
+  passwordCheck,
+} = require("../services/userServices");
+
 const {
   getPostCount,
   getReviewCount,
   getMissionClear,
   getBingoCount,
   getContinuousConnection,
-  updateBingoMission,
   updateMissionList,
   getBingoPattern,
   resetMission,
   resetBingo,
 } = require("../services/bingoService");
+
 const { bingoMission } = require("../utils/bingoMission");
 const { syncBingo } = require("../utils/syncBingo");
 
-exports.updateInquiry = async (req, res) => {
+const updateInquiry = async (req, res) => {
   try {
     const { title, email, content } = req.body;
     const inquiryDoc = await Inquiry.create({ title, email, content });
@@ -31,69 +37,57 @@ exports.updateInquiry = async (req, res) => {
     res.status(400).json({ error: "Invalid request" });
   }
 };
-exports.updateUser = async (req, res) => {
+const updateUser = async (req, res) => {
   try {
     const username = req.params.id;
     const { nickname, password } = req.body;
     console.log("test", username);
     console.log("nickname", nickname);
     console.log(nickname, password);
-    const userDoc = await UserServices.updateUserData(
-      username,
-      nickname,
-      password
-    );
+    const userDoc = await updateUserData(username, nickname, password);
     console.log("userDoc", userDoc);
-    res.status(200).json({ success: true });
+    res.status(200).json({ result: true });
   } catch (error) {
     console.error(error);
   }
 };
-exports.getUser = async (req, res) => {
-  try {
-    const userId = req.params.id;
-    const userDoc = await UserServices.getUserData(userId);
-    console.log("userId", userId);
-    console.log("userDoc", userDoc);
-    res.status(200).json({ success: true, userDoc });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-exports.deleteUser = async (req, res) => {
+const deleteUserInfo = async (req, res) => {
   try {
     const userId = req.params.id;
     console.log("test", userId);
-    const deletedUser = await UserServices.deleteUser(userId);
-    res.status(200).json({ success: true, message: deletedUser.message });
+    const deletedUser = await deleteUser(userId);
+    res.status(200).json({ result: true, message: deletedUser.message });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ result: false, message: error.message });
   }
 };
 
-exports.duplicateCheck = async (req, res) => {
+const duplicateCheck = async (req, res) => {
   try {
     const { nickname } = req.body;
     console.log(nickname);
-    const nicknameDoc = await UserServices.duplicateNickname(nickname);
+    const nicknameDoc = await duplicateNickname(nickname);
     console.log(nicknameDoc.message);
-    res.status(200).json({ success: true, message: nicknameDoc.message });
+    res.status(200).json({ result: true, message: nicknameDoc.message });
   } catch (error) {
-    res.status(409).json({ success: false, message: error.message });
+    res.status(409).json({ result: false, message: error.message });
   }
 };
-exports.passwordCheck = async (req, res) => {
+const pwCheck = async (req, res) => {
   try {
     const username = req.params.id;
     console.log("username test", username);
     const { password } = req.body;
-    await UserServices.passwordCheck(username, password);
-    res.status(200).json({ success: true });
+    const passwordDoc = await passwordCheck(username, password);
+    console.log("passwordDoc", passwordDoc);
+    if (passwordDoc) {
+      res.status(200).json({ result: true });
+    }
   } catch (error) {
-    res.status(401).json({ success: false, message: error.message });
+    res.status(401).json({ result: false, message: error.message });
   }
 };
-exports.updateMission = async (req, res) => {
+const updateMission = async (req, res) => {
   try {
     const userObjId = req.params.id;
     // const userInfo = await User.findOne({ username });
@@ -122,7 +116,7 @@ exports.updateMission = async (req, res) => {
     console.error(error);
   }
 };
-exports.getBingo = async (req, res) => {
+const getBingo = async (req, res) => {
   try {
     const userObjId = req.params.id;
     // const userInfo = await User.findOne({ username });
@@ -132,7 +126,7 @@ exports.getBingo = async (req, res) => {
     console.error(error);
   }
 };
-exports.getBingoCount = async (req, res) => {
+const getBingoCountFunc = async (req, res) => {
   try {
     const userObjId = req.params.id;
     // const userInfo = await User.findOne({ username });
@@ -142,7 +136,7 @@ exports.getBingoCount = async (req, res) => {
     console.error(error);
   }
 };
-exports.getBingoPattern = async (req, res) => {
+const getBingoPatternStatus = async (req, res) => {
   try {
     const userObjId = req.params.id;
     // const userInfo = await User.findOne({ username });
@@ -153,25 +147,25 @@ exports.getBingoPattern = async (req, res) => {
   }
 };
 // Remove later.
-exports.bingoStatusUpdate = async (req, res) => {
+const bingoStatusUpdate = async (req, res) => {
   try {
   } catch (error) {
     console.error(error);
   }
 };
 
-exports.bingoStatusReset = async (req, res) => {
+const bingoStatusReset = async (req, res) => {
   try {
     const userObjId = req.params.id;
     // const userInfo = await User.findOne({ username });
     const bingo = await resetBingo(userObjId);
-    await resetMission(userInfo._id);
+    await resetMission(userObjId);
     res.status(200).json({ bingo });
   } catch (error) {
     console.error(error);
   }
 };
-exports.getPost = async (req, res) => {
+const getPost = async (req, res) => {
   try {
     const username = req.params.id;
     const userInfo = await User.findOne({ username });
@@ -183,7 +177,7 @@ exports.getPost = async (req, res) => {
     console.error(error);
   }
 };
-exports.getSalePost = async (req, res) => {
+const getSalePost = async (req, res) => {
   try {
     console.log("start get sale post");
     const authorId = req.params.id;
@@ -197,7 +191,7 @@ exports.getSalePost = async (req, res) => {
 };
 
 // ================ 쿠폰 관련 API ====================
-exports.getCouponList = async (req, res) => {
+const getCouponList = async (req, res) => {
   try {
     const ownerId = req.params.id;
     const couponList = await Coupon.find({ owner: ownerId });
@@ -208,7 +202,7 @@ exports.getCouponList = async (req, res) => {
     console.error(error);
   }
 };
-exports.checkCoupon = async (req, res) => {
+const checkCoupon = async (req, res) => {
   try {
     const ownerId = req.params.id;
     const { coupon } = req.body;
@@ -227,7 +221,7 @@ exports.checkCoupon = async (req, res) => {
     console.error(error);
   }
 };
-exports.issuanceCoupon = async (req, res) => {
+const issuanceCoupon = async (req, res) => {
   try {
     const ownerId = req.params.id;
     const { coupon } = req.body;
@@ -257,7 +251,7 @@ exports.issuanceCoupon = async (req, res) => {
     console.error(error);
   }
 };
-exports.deleteCoupon = async (req, res) => {
+const deleteCoupon = async (req, res) => {
   try {
     console.log("delete coupon func");
     const id = req.params.id;
@@ -268,7 +262,7 @@ exports.deleteCoupon = async (req, res) => {
     console.error(error);
   }
 };
-exports.couponStatusChange = async (req, res) => {
+const couponStatusChange = async (req, res) => {
   try {
     const couponId = req.params.id;
     await Coupon.findByIdAndUpdate(couponId, { status: "expired" });
@@ -298,3 +292,24 @@ cron.schedule("0 0 * * *", () => {
   console.log("Running daily coupon expiration check");
   checkAndExpireCoupons();
 });
+
+module.exports = {
+  // getUser,
+  updateInquiry,
+  deleteUserInfo,
+  duplicateCheck,
+  pwCheck,
+  updateUser,
+  getBingo,
+  getBingoCountFunc,
+  getBingoPatternStatus,
+  getPost,
+  updateMission,
+  bingoStatusReset,
+  checkCoupon,
+  issuanceCoupon,
+  getCouponList,
+  deleteCoupon,
+  couponStatusChange,
+  getSalePost,
+};
