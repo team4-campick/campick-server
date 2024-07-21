@@ -13,12 +13,11 @@ const getReviews = async (req, res) => {
 };
 const createReview = async (req, res) => {
   try {
-    const username = req.params.id;
-    // 여기서 username은 현재 로그인된 유저의 id이다.
-    console.log("username", username);
+    // const username = req.params.id;
+    const userObjId = req.params.id;
     const { score, review, contentId } = req.body;
     console.log(score, review, contentId);
-    const user = await User.findOne({ username });
+    const user = await User.findById(userObjId);
 
     if (!user) {
       throw new Error("User not found");
@@ -34,9 +33,9 @@ const createReview = async (req, res) => {
       { $inc: { reviewCount: 1 } }
     );
 
-    res.status(200).json(newReview);
+    res.status(200).json({ result: true, newReview });
   } catch (error) {
-    res.status(403).send("Error");
+    res.status(403).json({ result: false });
   }
 };
 const deleteReview = async (req, res) => {
