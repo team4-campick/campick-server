@@ -37,8 +37,8 @@ router.get("/bingo-area/:id", getBingo);
 router.get("/bingo-count/:id", getBingoCountFunc);
 router.get("/bingo-pattern/:id", getBingoPatternStatus);
 router.get("/post/:id", getPost);
-router.post("/update-mission/:id", updateMission);
-router.post("/reset-bingo/:id", bingoStatusReset);
+router.put("/update-mission/:id", updateMission);
+router.put("/reset-bingo/:id", bingoStatusReset);
 router.post("/check-duplicate/:id", checkCoupon);
 
 // router.get("/coupon/:id", getCouponList);
