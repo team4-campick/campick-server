@@ -3,19 +3,21 @@ const Mission = require("../models/Mission");
 const Post = require("../models/Post");
 const Review = require("../models/Review");
 const User = require("../models/User");
-const hash = require("../utils/encrypt");
-const bcrypt = require("bcryptjs");
+const { encrypt } = require("../utils/encrypt");
+const { compareSync } = require("bcryptjs");
 
 class UserService {
-  async deleteUser(username) {
-    console.log("userId :", username);
-    const user = await User.findOneAndDelete({ username });
-    await Bingo.findByIdAndDelete(user._id);
-    await Mission.findByIdAndDelete(user._id);
-    await Post.findByIdAndDelete(user._id);
-    await Review.findByIdAndDelete(user._id);
-    console.log("test", user);
-    return { message: "User successfully deleted" };
+  async deleteUser(userObjId) {
+    try {
+      await User.findByIdAndDelete(userObjId);
+      await Bingo.findByIdAndDelete(userObjId);
+      await Mission.findByIdAndDelete(userObjId);
+      await Post.findByIdAndDelete(userObjId);
+      await Review.findByIdAndDelete(userObjId);
+      return { result: true, message: "User successfully deleted" };
+    } catch (error) {
+      console.error(error);
+    }
   }
   async duplicateNickname(nickname) {
     console.log("func nickname", typeof nickname);
@@ -24,21 +26,22 @@ class UserService {
     if (nicknameCheck) throw new Error("Nickname already exists");
     return { message: "Can use this nickname" };
   }
-  async updateUserData(username, nickname, password) {
-    console.log("test", username, nickname, password);
-    const hashedPassword = hash.encrypt(password);
-    const user = await User.findOneAndUpdate(
-      { username },
-      { nickname, password: hashedPassword },
-      { new: true }
-    );
-    return user;
+  async updateUserData(userObjId, nickname, password) {
+    try {
+      const hashedPassword = encrypt(password);
+      await User.findByIdAndUpdate(
+        userObjId,
+        { nickname, password: hashedPassword },
+        { new: true }
+      );
+      return { result: true };
+    } catch (error) {}
   }
-  async passwordCheck(username, password) {
-    const user = await User.findOne({ username });
+  async passwordCheck(id, password) {
+    const user = await User.findById(id);
     console.log("user.password", user.password);
     console.log("password", password);
-    const validPassword = bcrypt.compareSync(password, user.password);
+    const validPassword = compareSync(password, user.password);
     console.log("validPassword : ", validPassword);
     if (validPassword) {
       return true;
