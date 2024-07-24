@@ -1,7 +1,6 @@
 const User = require("../models/User");
 const Mission = require("../models/Mission");
 const Bingo = require("../models/Bingo");
-const Coupon = require("../models/Coupon");
 
 const { shuffle } = require("../utils/shuffle");
 const { bingoRule } = require("../utils/bingoRule");
@@ -20,14 +19,17 @@ class BingoService {
   //   const updatedMission = await Mission.findOneAndUpdate({ _id }, { mission });
   //   return updatedMission;
   // }
+  async getUserBingo(id) {
+    return await Bingo.findById(id);
+  }
+  async getMission(id) {
+    const mission = await Mission.findById(id);
+    console.log("미션을 받아와서 중복을 줄이기 시도 1", mission);
+    return mission;
+  }
   async getReviewCount(id) {
-    // 리뷰 카운트 업데이트 -> 이렇게 하면 리셋 했을때 문제 해결!
-    // const mission = await Mission.findById(_id);
-    // const count = mission.reviewCount.length;
-    // return count;
     const review = await Mission.findById(id);
     const count = review ? review.reviewCount : 0;
-    console.log("리뷰 갯수", count);
     return count;
   }
   async getPostCount(id) {
@@ -38,8 +40,8 @@ class BingoService {
     return count;
   }
   async getMissionClear(id) {
-    const bingo = await Bingo.findById(id);
-    const count = missionClearCounter(bingo.bingo);
+    const getBingo = await Bingo.findById(id);
+    const count = missionClearCounter(getBingo.bingo);
     return count;
   }
   async getBingoCount(id) {
@@ -58,28 +60,39 @@ class BingoService {
     const pattern = bingoRule(getBingo.bingo).bingoPattern;
     return pattern;
   }
-  // async updateBingoMission(_id, newMission) {
-  //   const updatedMission = await Mission.findByIdAndUpdate(
-  //     _id,
-  //     {
-  //       postCount: newMission.postCount,
-  //     },
-  //     { new: true }
-  //   );
-  //   return updatedMission;
-  // }
+  async updateBingo(id, updatedBingo) {
+    return await Bingo.findByIdAndUpdate(id, { $set: updatedBingo });
+  }
   async updateMissionList(_id, newMission) {
+    const {
+      postCount,
+      reviewCount,
+      missionClear,
+      bingoCount,
+      continuousConnection,
+    } = newMission;
     const updatedMission = await Mission.findByIdAndUpdate(
       _id,
       {
-        postCount: newMission.postCount,
-        reviewCount: newMission.reviewCount,
-        missionClear: newMission.missionClear,
-        bingoCount: newMission.bingoCount,
-        continuousConnection: newMission.continuousConnection,
+        postCount,
+        reviewCount,
+        missionClear,
+        bingoCount,
+        continuousConnection,
       },
       { new: true }
     );
+    // const updatedMission = await Mission.findByIdAndUpdate(
+    //   _id,
+    //   {
+    //     postCount: newMission.postCount,
+    //     reviewCount: newMission.reviewCount,
+    //     missionClear: newMission.missionClear,
+    //     bingoCount: newMission.bingoCount,
+    //     continuousConnection: newMission.continuousConnection,
+    //   },
+    //   { new: true }
+    // );
     return updatedMission;
   }
   async resetMission(_id) {
