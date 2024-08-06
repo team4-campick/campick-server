@@ -133,10 +133,20 @@ const login = async (req, res) => {
   }
 };
 
+// const logout = (req, res) => {
+//   // res.cookie("token", "").json();
+//   res.clearCookie("token");
+//   res.status(200).json({ message: "로그아웃되었습니다." });
+// };
+
 const logout = (req, res) => {
-  // res.cookie("token", "").json();
-  res.clearCookie("token");
-  res.status(200).json({ message: "로그아웃되었습니다." });
+  res.cookie("token", "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    expires: new Date(0), // 만료 날짜를 과거로 설정하여 쿠키 삭제
+    path: "/", // 모든 경로에서 쿠키 삭제
+  });
+  res.status(200).json({ message: "Logged out" });
 };
 
 const profile = async (req, res) => {
