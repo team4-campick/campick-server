@@ -109,6 +109,10 @@ const login = async (req, res) => {
       }
     );
 
+    if (!token) {
+      return res.status(500).json({ message: "Token creation failed" });
+    }
+
     await User.findByIdAndUpdate(user._id, { $push: { loginDate } });
 
     res
