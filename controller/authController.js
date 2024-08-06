@@ -145,6 +145,7 @@ const logout = (req, res) => {
     secure: process.env.NODE_ENV === "production",
     expires: new Date(0), // 만료 날짜를 과거로 설정하여 쿠키 삭제
     path: "/", // 모든 경로에서 쿠키 삭제
+    sameSite: "none",
   });
   res.status(200).json({ message: "Logged out" });
 };
