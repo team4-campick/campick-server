@@ -130,7 +130,9 @@ const login = async (req, res) => {
 };
 
 const logout = (req, res) => {
-  res.cookie("token", "").json();
+  // res.cookie("token", "").json();
+  res.clearCookie("token");
+  res.status(200).json({ message: "로그아웃되었습니다." });
 };
 
 const profile = async (req, res) => {
