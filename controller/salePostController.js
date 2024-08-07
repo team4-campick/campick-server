@@ -1,16 +1,20 @@
 const fs = require("fs");
-const SalePost = require("../models/salePostModel.js");
 const { cloudinaryUpload } = require("../utils/fileUpload.js");
 const { deleteUploadedImages } = require("../utils/deleteUploadedImages.js");
+
+const {
+  getSalePostByTarget,
+  deleteSalePostById,
+  getSalePost,
+  createNewSalePost,
+} = require("../services/salePostService.js");
 
 const getSalePosts = async (req, res) => {
   const { category, keyword } = req.query;
 
   if (category) {
     try {
-      const salePosts = await SalePost.find({ category }).sort({
-        createdAt: -1,
-      });
+      const salePosts = await getSalePostByTarget("category", category);
       if (salePosts.length === 0) {
         return res.status(200).json({ result: true, salePosts: [] });
       }
@@ -29,9 +33,7 @@ const getSalePosts = async (req, res) => {
 
     try {
       // 키워드가 포함된 데이터를 find
-      const salePosts = await SalePost.find({ productName: regex }).sort({
-        createdAt: -1,
-      });
+      const salePosts = await getSalePostByTarget("productName", regex);
       if (salePosts.length === 0) {
         return res.status(200).json({ result: true, salePosts: [] });
       }
@@ -46,7 +48,7 @@ const getSalePosts = async (req, res) => {
   }
 
   try {
-    const salePosts = await SalePost.find({}).sort({ createdAt: -1 });
+    const salePosts = await getSalePostByTarget();
     return res.status(200).json({ result: true, salePosts });
   } catch (error) {
     console.log(error);
@@ -61,7 +63,7 @@ const getSalePostById = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const salePost = await SalePost.findById(id);
+    const salePost = await getSalePost(id);
     if (!salePost) {
       return res
         .status(404)
@@ -91,16 +93,13 @@ const createSalePost = async (req, res) => {
 
   const { nickname, _id } = req.user;
   try {
-    const salePost = new SalePost({
-      ...newPost,
-      city: newPost.city ?? " ",
-      imageUrls: [...imageUrls],
-      salesStatus: "판매중",
-      author: nickname,
-      authorId: _id,
-    });
-
-    await salePost.save();
+    const salePost = await createNewSalePost(
+      newPost,
+      newPost.city,
+      imageUrls,
+      nickname,
+      _id
+    );
     return res.status(201).json({ result: true, salePost });
   } catch (error) {
     console.log(error);
@@ -126,7 +125,7 @@ const updateSalePost = async (req, res) => {
   } = req.body;
 
   try {
-    const salePost = await SalePost.findById(id);
+    const salePost = await getSalePost(id);
     if (!salePost) {
       return res
         .status(404)
@@ -158,7 +157,7 @@ const deleteSalePost = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const salePost = await SalePost.findById(id);
+    const salePost = await getSalePost(id);
     if (!salePost) {
       return res
         .status(404)
@@ -167,7 +166,7 @@ const deleteSalePost = async (req, res) => {
     // 업로드된 이미지 파일 cloudinary에서 삭제
     const { imageUrls } = salePost;
     deleteUploadedImages(imageUrls);
-    await SalePost.deleteOne({ _id: id });
+    await deleteSalePostById(id);
 
     return res
       .status(200)

@@ -4,9 +4,12 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 
-const User = require("../models/User");
-const Mission = require("../models/Mission");
-const Bingo = require("../models/Bingo");
+const {
+  getUserByUserName,
+  createUser,
+  loginDateInfoUpdate,
+} = require("../services/userServices");
+const { createBingo, createMission } = require("../services/bingoService");
 
 const { shuffle } = require("../utils/shuffle");
 const { encrypt } = require("../utils/encrypt");
@@ -48,27 +51,10 @@ const register = async (req, res) => {
     }
 
     const hashedPassword = encrypt(password);
-    const tr = await User.create({
-      username,
-      password: hashedPassword,
-      nickname,
-    });
-
+    const tr = await createUser(username, hashedPassword, nickname);
     shuffle(BINGO_AREA);
-
-    await Bingo.create({
-      _id: tr._id,
-      bingo: BINGO_AREA,
-    });
-
-    await Mission.create({
-      _id: tr._id,
-      postCount: 0,
-      reviewCount: 0,
-      missionClear: 0,
-      bingoCount: 0,
-      continuousConnection: 1,
-    });
+    await createBingo(tr._id, BINGO_AREA);
+    await createMission(tr._id, 0, 0, 0, 0, 1);
 
     res.status(200).json({ message: "User created", user: tr });
   } catch (error) {
@@ -91,7 +77,7 @@ const login = async (req, res) => {
   }
 
   try {
-    const user = await User.findOne({ username });
+    const user = await getUserByUserName(username);
     if (!user) {
       return res.status(404).json({ message: "nouser" });
     }
@@ -112,8 +98,7 @@ const login = async (req, res) => {
     if (!token) {
       return res.status(500).json({ message: "Token creation failed" });
     }
-
-    await User.findByIdAndUpdate(user._id, { $push: { loginDate } });
+    await loginDateInfoUpdate(user._id, loginDate);
 
     res
       .cookie("token", token, {
@@ -132,12 +117,6 @@ const login = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
-
-// const logout = (req, res) => {
-//   // res.cookie("token", "").json();
-//   res.clearCookie("token");
-//   res.status(200).json({ message: "로그아웃되었습니다." });
-// };
 
 const logout = (req, res) => {
   res.cookie("token", "", {
