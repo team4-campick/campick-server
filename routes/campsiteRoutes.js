@@ -13,8 +13,8 @@ router.post("/create-review/:id", createReview);
 router
   .route("/review/:id")
   .get(getReviews)
-  .post(createReview)
-  .put(editReview)
+  .put(createReview)
+  .post(editReview)
   .delete(deleteReview);
 
 module.exports = router;
