@@ -18,6 +18,5 @@ exports.consecutiveVisitDays = (dateArr) => {
     }
     count++;
   }
-  console.log("연속접속일 : ", count);
   return count;
 };
