@@ -8,26 +8,47 @@ const { missionClearCounter } = require("../utils/missionClearCounter");
 const { consecutiveVisitDays } = require("../utils/consecutiveVisitDays");
 
 const { BINGO_AREA } = require("../constants/bingoArea");
-const Coupon = require("../models/Coupon");
 
 class BingoService {
-  // async getMissionStatus(_id) {
-  //   const mission = await Mission.findOne({ _id });
-  //   return mission;
-  // }
-  // async updateMissionStatus(_id, mission) {
-  //   console.log('mission check : ', mission);
-  //   const updatedMission = await Mission.findOneAndUpdate({ _id }, { mission });
-  //   return updatedMission;
-  // }
+  async createBingo(_id, bingo) {
+    try {
+      await Bingo.create({ _id, bingo });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  async createMission(
+    _id,
+    postCount,
+    reviewCount,
+    missionClear,
+    bingoCount,
+    continuousConnection
+  ) {
+    try {
+      await Mission.create({
+        _id,
+        postCount,
+        reviewCount,
+        missionClear,
+        bingoCount,
+        continuousConnection,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async getUserBingo(id) {
+    return await Bingo.findById(id);
+  }
+  async getMission(id) {
+    const mission = await Mission.findById(id);
+    return mission;
+  }
   async getReviewCount(id) {
-    // 리뷰 카운트 업데이트 -> 이렇게 하면 리셋 했을때 문제 해결!
-    // const mission = await Mission.findById(_id);
-    // const count = mission.reviewCount.length;
-    // return count;
     const review = await Mission.findById(id);
     const count = review ? review.reviewCount : 0;
-    console.log("리뷰 갯수", count);
     return count;
   }
   async getPostCount(id) {
@@ -38,8 +59,8 @@ class BingoService {
     return count;
   }
   async getMissionClear(id) {
-    const bingo = await Bingo.findById(id);
-    const count = missionClearCounter(bingo.bingo);
+    const getBingo = await Bingo.findById(id);
+    const count = missionClearCounter(getBingo.bingo);
     return count;
   }
   async getBingoCount(id) {
@@ -47,8 +68,7 @@ class BingoService {
     const count = bingoRule(getBingo.bingo).count;
     return count;
   }
-  async getContinuousConnection(id) {
-    const user = await User.findById(id);
+  async getContinuousConnection(user) {
     const loginDate = user ? user.loginDate : null;
     const count = loginDate ? consecutiveVisitDays(loginDate) : 1;
     return count;
@@ -58,25 +78,30 @@ class BingoService {
     const pattern = bingoRule(getBingo.bingo).bingoPattern;
     return pattern;
   }
-  // async updateBingoMission(_id, newMission) {
-  //   const updatedMission = await Mission.findByIdAndUpdate(
-  //     _id,
-  //     {
-  //       postCount: newMission.postCount,
-  //     },
-  //     { new: true }
-  //   );
-  //   return updatedMission;
-  // }
+  async updateBingo(id, updatedBingo) {
+    return await Bingo.findByIdAndUpdate(id, { $set: updatedBingo });
+  }
+  async countIncMission(_id, targetArea) {
+    const incrementObject = {};
+    incrementObject[targetArea] = 1;
+    return await Mission.findByIdAndUpdate(_id, { $inc: incrementObject });
+  }
   async updateMissionList(_id, newMission) {
+    const {
+      postCount,
+      reviewCount,
+      missionClear,
+      bingoCount,
+      continuousConnection,
+    } = newMission;
     const updatedMission = await Mission.findByIdAndUpdate(
       _id,
       {
-        postCount: newMission.postCount,
-        reviewCount: newMission.reviewCount,
-        missionClear: newMission.missionClear,
-        bingoCount: newMission.bingoCount,
-        continuousConnection: newMission.continuousConnection,
+        postCount,
+        reviewCount,
+        missionClear,
+        bingoCount,
+        continuousConnection,
       },
       { new: true }
     );

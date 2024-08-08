@@ -1,8 +1,13 @@
-const BlogPost = require("../models/blogPostModel.js");
 const fs = require("fs");
 const { cloudinaryUpload } = require("../utils/fileUpload.js");
-const Mission = require("../models/Mission.js");
 const { deleteUploadedImages } = require("../utils/deleteUploadedImages.js");
+const {
+  getAllBlogPosts,
+  getBlogPost,
+  newBlogPost,
+  deleteBlogPostById,
+} = require("../services/blogPostService.js");
+const { countIncMission } = require("../services/bingoService.js");
 //이미지 업로드
 const uploadImages = async (req, res) => {
   try {
@@ -25,7 +30,7 @@ const uploadImages = async (req, res) => {
 console.log(uploadImages);
 const getBlogPosts = async (req, res) => {
   try {
-    const blogPosts = await BlogPost.find().sort({ createdAt: -1 });
+    const blogPosts = await getAllBlogPosts();
     if (blogPosts.length === 0) {
       return res.status(200).json({ result: true, blogPosts: [] });
     }
@@ -42,7 +47,7 @@ const getBlogPostById = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const blogPost = await BlogPost.findById(id);
+    const blogPost = await getBlogPost(id);
     if (!blogPost) {
       return res
         .status(404)
@@ -68,30 +73,17 @@ const createBlogPost = async (req, res) => {
     fs.unlinkSync(file.path);
   }
   const newPost = JSON.parse(req.body.newPost);
-
   const { nickname, _id } = req.user;
 
-  const mission = await Mission.findByIdAndUpdate(
-    { _id },
-    { $inc: { postCount: 1 } }
-  );
+  await countIncMission(_id, "postCount");
 
   try {
-    const blogPost = new BlogPost({
-      ...newPost,
-      _city: newPost.city ?? " ",
-      get city() {
-        return this._city;
-      },
-      set city(value) {
-        this._city = value;
-      },
+    const blogPost = await newBlogPost(
+      newPost,
       backgroundImgUrls,
-      author: nickname,
-      authorId: _id,
-    });
-
-    await blogPost.save();
+      nickname,
+      _id
+    );
     return res.status(201).json({ result: true, blogPost });
   } catch (error) {
     console.log(error);
@@ -115,7 +107,7 @@ const updateBlogPost = async (req, res) => {
   } = req.body;
 
   try {
-    const blogPost = await BlogPost.findById(id);
+    const blogPost = await getBlogPost(id);
     if (!blogPost) {
       return res
         .status(404)
@@ -145,7 +137,7 @@ const deleteBlogPost = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const blogPost = await BlogPost.findById(id);
+    const blogPost = await getBlogPost(id);
     if (!blogPost) {
       return res
         .status(404)
@@ -155,7 +147,7 @@ const deleteBlogPost = async (req, res) => {
     const { imageUrls, backgroundImgUrls } = blogPost;
     deleteUploadedImages([...imageUrls, ...backgroundImgUrls]);
 
-    await BlogPost.deleteOne({ _id: id });
+    await deleteBlogPostById(id);
 
     return res
       .status(200)

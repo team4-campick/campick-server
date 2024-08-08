@@ -3,50 +3,86 @@ const Mission = require("../models/Mission");
 const Post = require("../models/Post");
 const Review = require("../models/Review");
 const User = require("../models/User");
-const hash = require("../utils/encrypt");
-const bcrypt = require("bcryptjs");
+const { encrypt } = require("../utils/encrypt");
+const { compareSync } = require("bcryptjs");
 
 class UserService {
-  async getUserData(username) {
-    const user = await User.findOne({ username });
-    return user;
+  async createUser(username, password, nickname) {
+    try {
+      const tr = await User.create({
+        username,
+        password,
+        nickname,
+      });
+      return tr;
+    } catch (error) {
+      console.error(error);
+    }
   }
-  async deleteUser(username) {
-    console.log("userId :", username);
-    const user = await User.findOneAndDelete({ username });
-    await Bingo.findByIdAndDelete(user._id);
-    await Mission.findByIdAndDelete(user._id);
-    await Post.findByIdAndDelete(user._id);
-    await Review.findByIdAndDelete(user._id);
-    console.log("test", user);
-    return { message: "User successfully deleted" };
+  async getUserByUserName(username) {
+    try {
+      const user = await User.findOne({ username });
+      return user;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  async getUserById(id) {
+    try {
+      const user = await User.findById(id);
+      return user;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  async deleteUser(userObjId) {
+    try {
+      await User.findByIdAndDelete(userObjId);
+      await Bingo.findByIdAndDelete(userObjId);
+      await Mission.findByIdAndDelete(userObjId);
+      await Post.findByIdAndDelete(userObjId);
+      await Review.findByIdAndDelete(userObjId);
+      return { result: true, message: "User successfully deleted" };
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  async loginDateInfoUpdate(id, loginDate) {
+    try {
+      await User.findByIdAndUpdate(id, { $push: { loginDate } });
+    } catch (error) {
+      console.error(error);
+    }
   }
   async duplicateNickname(nickname) {
-    console.log("func nickname", typeof nickname);
-    const nicknameCheck = await User.findOne({ nickname });
-    console.log("nicknameCheck", nicknameCheck);
-    if (nicknameCheck) throw new Error("Nickname already exists");
-    return { message: "Can use this nickname" };
+    try {
+      const nicknameCheck = await User.findOne({ nickname });
+      if (nicknameCheck) throw new Error("Nickname already exists");
+      return { message: "Can use this nickname" };
+    } catch (error) {
+      console.error(error);
+    }
   }
-  async updateUserData(username, nickname, password) {
-    console.log("test", username, nickname, password);
-    const hashedPassword = hash.encrypt(password);
-    const user = await User.findOneAndUpdate(
-      { username },
-      { nickname, password: hashedPassword }
-    );
-    return user;
+  async updateUserData(userObjId, nickname, password) {
+    try {
+      const hashedPassword = encrypt(password);
+      await User.findByIdAndUpdate(
+        userObjId,
+        { nickname, password: hashedPassword },
+        { new: true }
+      );
+      return { result: true };
+    } catch (error) {
+      console.error(error);
+    }
   }
-  async passwordCheck(username, password) {
-    const user = await User.findOne({ username });
-    console.log("user.password", user.password);
-    console.log("password", password);
-    const validPassword = bcrypt.compareSync(password, user.password);
-    console.log("validPassword : ", validPassword);
-    if (validPassword) {
-      return true;
-    } else {
-      throw new Error("Wrong username or password");
+  async passwordCheck(id, password) {
+    try {
+      const user = await User.findById(id);
+      const validPassword = compareSync(password, user.password);
+      if (validPassword) return true;
+    } catch (error) {
+      console.error(error);
     }
   }
 }
