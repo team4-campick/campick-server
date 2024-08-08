@@ -35,6 +35,12 @@ const getConversations = async (req, res) => {
   try {
     const loggedInUserId = req.user._id;
 
+    const con = await Conversation.find({
+      participants: loggedInUserId,
+    });
+
+    con.forEach((el) => console.log(el.participants));
+
     const myConversations = await Conversation.find({
       participants: loggedInUserId,
     })
@@ -44,12 +50,17 @@ const getConversations = async (req, res) => {
       })
       .sort({ updatedAt: -1 });
 
+    console.log(myConversations);
+    // console.log("loggedInUserId", loggedInUserId);
     const filteredChats = myConversations.map((chat) => {
+      // console.log(chat.participants);
       chat.participants = chat.participants.filter(
         (participant) => !participant._id.equals(loggedInUserId)
       );
       return chat;
     });
+
+    // console.log("filteredChats", filteredChats);
 
     // 왼쪽 채팅창에 보여주기 위해서 로그인한 유저(나)를 제외한 나머지 유저들의 정보를 반환
     // const filteredUsers = await User.find({
