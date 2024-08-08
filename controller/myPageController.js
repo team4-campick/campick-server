@@ -1,22 +1,13 @@
-const Inquiry = require("../models/Inquiry");
-const User = require("../models/User");
-const Bingo = require("../models/Bingo");
-const Coupon = require("../models/Coupon");
-const BlogPost = require("../models/blogPostModel");
-const SalePost = require("../models/salePostModel");
-const cron = require("node-cron");
-
 const {
   updateUserData,
   deleteUser,
   duplicateNickname,
   passwordCheck,
+  getUserById,
 } = require("../services/userServices");
 
 const {
   getMission,
-  // getPostCount,
-  // getReviewCount,
   getMissionClear,
   getBingoCount,
   getContinuousConnection,
@@ -34,6 +25,9 @@ const {
   removeCoupon,
   expiredCoupon,
 } = require("../services/couponService");
+
+const { getBlogPostByAuthorId } = require("../services/blogPostService");
+const { getSalePostById } = require("../services/salePostService");
 
 const { createInquiry } = require("../services/inquiryService");
 
@@ -69,7 +63,6 @@ const deleteUserInfo = async (req, res) => {
     res.status(500).json({ result: false, message: error.message });
   }
 };
-
 const duplicateCheck = async (req, res) => {
   try {
     const { nickname } = req.body;
@@ -95,18 +88,11 @@ const pwCheck = async (req, res) => {
 const updateMission = async (req, res) => {
   try {
     const userObjId = req.params.id;
-    // 아래 postCount, reviewCount, missionClear, bingoCount, continuousConnection 은 Mission를 가져와서 업데이트 하면 되는거 아닌가..
-
-    // test
     const { postCount, reviewCount } = await getMission(userObjId);
-
-    console.log("postCount", postCount);
-    console.log("reviewCount", reviewCount);
-    // const postCount = await getPostCount(userObjId);
-    // const reviewCount = await getReviewCount(userObjId);
     const missionClear = await getMissionClear(userObjId);
     const bingoCount = await getBingoCount(userObjId);
-    const continuousConnection = await getContinuousConnection(userObjId);
+    const user = await getUserById(userObjId);
+    const continuousConnection = await getContinuousConnection(user);
 
     const newMission = {
       postCount,
@@ -116,8 +102,6 @@ const updateMission = async (req, res) => {
       continuousConnection,
     };
     const checkedMission = bingoMission(newMission);
-
-    // const bingo = await Bingo.findById(userObjId);
     const bingo = await getUserBingo(userObjId);
     const mission = await updateMissionList(userObjId, newMission);
     const updatedBingo = await syncBingo(bingo, checkedMission);
@@ -168,8 +152,7 @@ const bingoStatusReset = async (req, res) => {
 const getPost = async (req, res) => {
   try {
     const authorId = req.params.id;
-    // BlogPost 부분은 서비스단 생기면 옮길 예정
-    const blogPost = await BlogPost.find({ authorId });
+    const blogPost = await getBlogPostByAuthorId(authorId);
     res.status(200).json({ result: true, blogPost });
   } catch (error) {
     console.error(error);
@@ -178,20 +161,17 @@ const getPost = async (req, res) => {
 const getSalePost = async (req, res) => {
   try {
     const authorId = req.params.id;
-    // salePost 부분은 서비스단 생기면 옮길 예정
-    const salePost = await SalePost.find({ authorId });
+    const salePost = await getSalePostById(authorId);
     res.status(200).json({ result: true, salePost });
   } catch (error) {
     console.error(error);
   }
 };
 
-// ================ 쿠폰 관련 ====================
 const getCouponList = async (req, res) => {
   try {
     const ownerId = req.params.id;
     const couponList = await getCoupons(ownerId);
-    // const couponList = await Coupon.findById(userInfo._id).populate("owner");
     res.status(200).json({ result: true, couponList });
   } catch (error) {
     res.status(400).json({ result: false, message: error.message });
@@ -202,7 +182,6 @@ const checkCoupon = async (req, res) => {
     const ownerId = req.params.id;
     const { coupon } = req.body;
     const userCoupon = await availableCoupons(ownerId, coupon);
-    console.log("userCoupon", userCoupon);
     if (!userCoupon) {
       res.status(200).json({ result: true, message: "쿠폰이 없습니다." });
     }
@@ -216,26 +195,6 @@ const issuanceCoupon = async (req, res) => {
   try {
     const ownerId = req.params.id;
     const { coupon } = req.body;
-    // const serialNum = Math.floor(
-    //   100000000000 + Math.random() * 900000000000
-    // ).toString();
-    // const getDateNdays = async (nowDate, date) => {
-    //   const expirationDate = new Date(nowDate);
-    //   expirationDate.setDate(expirationDate.getDate() + date);
-    //   return new Date(expirationDate).toISOString();
-    // };
-
-    // await Coupon.create({
-    //   owner: ownerId,
-    //   date: coupon.DATE,
-    //   condition: coupon.CONDITION,
-    //   type: coupon.TYPE,
-    //   serialNum,
-    //   status: "active",
-    //   activeDate: new Date().toISOString(),
-    //   expireDate: await getDateNdays(new Date(), coupon.DATE),
-    // });
-
     await createCoupon(ownerId, coupon);
     res.status(201).json({ result: true, message: "새로운 쿠폰 발급 완료" });
   } catch (error) {
@@ -255,7 +214,6 @@ const couponStatusChange = async (req, res) => {
   try {
     const couponId = req.params.id;
     await expiredCoupon(couponId);
-    // await Coupon.findByIdAndUpdate(couponId, { status: "expired" });
     res.status(204).json({ result: true, message: "상태 변경 완료" });
   } catch (error) {
     res.status(400).json({ result: false, message: error.message });

@@ -2,7 +2,6 @@ const { Router } = require("express");
 const router = Router();
 
 const {
-  // getUser,
   updateInquiry,
   deleteUserInfo,
   duplicateCheck,
@@ -21,8 +20,6 @@ const {
   couponStatusChange,
   getSalePost,
 } = require("../controller/myPageController");
-
-// router.get("/get-user/:id", getUser);
 
 router.post("/inquiry", updateInquiry);
 
@@ -46,8 +43,8 @@ router.post("/check-duplicate/:id", checkCoupon);
 router
   .route("/coupon/:id")
   .get(getCouponList)
-  .post(issuanceCoupon)
-  .put(couponStatusChange)
+  .put(issuanceCoupon)
+  .post(couponStatusChange)
   .delete(deleteCoupon);
 // router.delete("/coupon/:id", deleteCoupon);
 // router.post("/coupon/:id", couponStatusChange);

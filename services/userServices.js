@@ -7,6 +7,34 @@ const { encrypt } = require("../utils/encrypt");
 const { compareSync } = require("bcryptjs");
 
 class UserService {
+  async createUser(username, password, nickname) {
+    try {
+      const tr = await User.create({
+        username,
+        password,
+        nickname,
+      });
+      return tr;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  async getUserByUserName(username) {
+    try {
+      const user = await User.findOne({ username });
+      return user;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  async getUserById(id) {
+    try {
+      const user = await User.findById(id);
+      return user;
+    } catch (error) {
+      console.error(error);
+    }
+  }
   async deleteUser(userObjId) {
     try {
       await User.findByIdAndDelete(userObjId);
@@ -19,12 +47,21 @@ class UserService {
       console.error(error);
     }
   }
+  async loginDateInfoUpdate(id, loginDate) {
+    try {
+      await User.findByIdAndUpdate(id, { $push: { loginDate } });
+    } catch (error) {
+      console.error(error);
+    }
+  }
   async duplicateNickname(nickname) {
-    console.log("func nickname", typeof nickname);
-    const nicknameCheck = await User.findOne({ nickname });
-    console.log("nicknameCheck", nicknameCheck);
-    if (nicknameCheck) throw new Error("Nickname already exists");
-    return { message: "Can use this nickname" };
+    try {
+      const nicknameCheck = await User.findOne({ nickname });
+      if (nicknameCheck) throw new Error("Nickname already exists");
+      return { message: "Can use this nickname" };
+    } catch (error) {
+      console.error(error);
+    }
   }
   async updateUserData(userObjId, nickname, password) {
     try {
@@ -35,18 +72,17 @@ class UserService {
         { new: true }
       );
       return { result: true };
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+    }
   }
   async passwordCheck(id, password) {
-    const user = await User.findById(id);
-    console.log("user.password", user.password);
-    console.log("password", password);
-    const validPassword = compareSync(password, user.password);
-    console.log("validPassword : ", validPassword);
-    if (validPassword) {
-      return true;
-    } else {
-      throw new Error("Wrong username or password");
+    try {
+      const user = await User.findById(id);
+      const validPassword = compareSync(password, user.password);
+      if (validPassword) return true;
+    } catch (error) {
+      console.error(error);
     }
   }
 }

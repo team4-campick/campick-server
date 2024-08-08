@@ -4,8 +4,8 @@ const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const cloudinary = require("cloudinary");
 const path = require("path");
-const imageRoutes = require("./routes/imageRoutes");
 
+const imageRoutes = require("./routes/imageRoutes");
 const salePostRoutes = require("./routes/salePostRoutes");
 const myPageRoute = require("./routes/myPageRoutes");
 const authRoutes = require("./routes/authRoutes");
@@ -14,7 +14,7 @@ const blogPostRoutes = require("./routes/blogPostRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 
 const { app, server } = require("./utils/socket");
-
+const { scheduleCouponExpirationCheck } = require("./utils/cron");
 const db = require("./db/connectDB");
 
 require("dotenv").config();
@@ -29,6 +29,7 @@ cloudinary.config({
 });
 
 app.use(cors({ credentials: true, origin: `${process.env.CLIENT_URL}` }));
+// app.use(cors({ credentials: true, origin: `http://localhost:${clientPort}` }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(bodyParser.json());
@@ -49,5 +50,5 @@ app.use("/", campsiteRoutes);
 db.connectDB();
 
 app.get("/", async (req, res) => res.json("Hello World!"));
-
+scheduleCouponExpirationCheck();
 server.listen(port, () => console.log(`${port}번에서 돌아감`));
