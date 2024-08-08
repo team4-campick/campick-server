@@ -24,8 +24,6 @@ const {
 router.post("/inquiry", updateInquiry);
 
 router.route("/user/:id").put(updateUser).delete(deleteUserInfo);
-// router.delete("/user/:id", deleteUser);
-// router.post("/user/:id", updateUser);
 
 router.post("/duplicateCheck", duplicateCheck);
 router.post("/passwordCheck/:id", pwCheck);
@@ -38,17 +36,12 @@ router.put("/update-mission/:id", updateMission);
 router.put("/reset-bingo/:id", bingoStatusReset);
 router.post("/check-duplicate/:id", checkCoupon);
 
-// router.get("/coupon/:id", getCouponList);
-
 router
   .route("/coupon/:id")
   .get(getCouponList)
   .put(issuanceCoupon)
   .post(couponStatusChange)
   .delete(deleteCoupon);
-// router.delete("/coupon/:id", deleteCoupon);
-// router.post("/coupon/:id", couponStatusChange);
-// router.post("/issue-coupon/:id", issuanceCoupon);
 
 router.get("/sale-post/:id", getSalePost);
 
