@@ -37,11 +37,11 @@ class UserService {
   }
   async deleteUser(userObjId) {
     try {
-      await User.findByIdAndDelete(userObjId);
       await Bingo.findByIdAndDelete(userObjId);
       await Mission.findByIdAndDelete(userObjId);
       await Post.findByIdAndDelete(userObjId);
       await Review.findByIdAndDelete(userObjId);
+      await User.findByIdAndDelete(userObjId);
       return { result: true, message: "User successfully deleted" };
     } catch (error) {
       console.error(error);
